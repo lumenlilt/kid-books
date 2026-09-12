@@ -30,12 +30,16 @@
   首次部署抓到 Cloudflare zone 層級的 Web Analytics 自動注入（CSP 擋下）與 NEL 標頭——探針已寫進 check-site，**要使用者到 dashboard 關**。
 - **畫面商用化第一輪**（2026-09-12，commit 0d66393，已部署）：使用者裁示「還沒到商用」→ 先做風格無關的光影（VSM 軟陰影、三點光＋窗光、
   RoomEnvironment、Neutral 色調、紙紋）與擺設（彩旗、窗簾、雲朵吊飾、海報、木地板、地毯、護牆板、窗外山丘雲）、封面圖樣、舞台細節；
-  `?ao=1` 可開 GTAO 比較。**風格（紙雕 vs 玩具）等使用者看實畫面裁示。**
+  `?ao=1` 可開 GTAO 比較。使用者看過後裁示**柔軟玩具風**（D27）。
+- **柔軟玩具風第一輪**（2026-09-12，commit 79037a6，已部署）：圓角盒＋倒角、霧面塑膠材質、GTAO 預設開、自製圓潤擺設（Kenney 家具移除）、
+  貓耳尾細分。`art/BRIEF.md` 寫好，等使用者出第一批 AI 圖（封面 ×5、場景卡 ×5、海報、舞台天空）。
 
 ## 下一步
 
 1. **等使用者**：(a) Azure 金鑰重產 → 我產四段聲線樣本讓他選 → 全量重產 → 重新部署；
-   (b) Cloudflare dashboard 關掉 Web Analytics 自動注入與 NEL（`check-site.sh` 會亮紅直到關掉）。
+   (b) Cloudflare dashboard 關掉 Web Analytics 自動注入與 NEL（`check-site.sh` 會亮紅直到關掉）；
+   (c) 依 `art/BRIEF.md` 出第一批 AI 圖放 `art/incoming/`；
+   (d) 看過玩具風成品，決定再修哪裡（候選：頁與頁的翻頁動畫、鐘樓構圖、點數字讓指針走過去、直向控制區、貓的造型）。
 2. 使用者用 iPad Safari 開 https://books.lumenlilt.app 實際玩一遍（加入主畫面），回報手感、台詞、聲音。
 3. 自家小孩實測（M3 就該排的）：我出 10 分鐘觀察表。
 4. 之後：第二本書選題（先量既有六種活動元件能表達多少頁，D16）、Playwright 煙霧測試、直向控制區再調。
