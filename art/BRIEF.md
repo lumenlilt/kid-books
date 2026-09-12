@@ -45,7 +45,7 @@ children's educational app illustration, Taiwanese kindergarten audience
 
 蘋果、籃子、數字積木、各 5–10 個可數的小物件（去背、單一物件）。等第一批對過風格再開。
 
-## 貓（吉祥物）概念圖 — 2026-09-13 新增
+## 貓（吉祥物）概念圖 — 2026-09-13 新增（✅ 同日收到三視圖 `art/reference/cat-concept.jpg`，已照圖建成 v5，見 DECISIONS D34）
 
 程式建到 v3 仍不夠（使用者裁示），改成「你出概念圖、我照圖建模」。要的東西：
 

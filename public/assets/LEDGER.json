@@ -26,7 +26,7 @@
       "license": "CC-BY-4.0",
       "url": "https://github.com/lumenlilt/kid-books",
       "retrieved": "2026-09-12",
-      "modified": "Blender 5.2 bpy 程序化建模輸出 GLB，可由腳本重生"
+      "modified": "Blender 5.2 bpy 程序化建模輸出 GLB，可由腳本重生；v5 照使用者提供的概念圖 art/reference/cat-concept.jpg 建（D34）"
     },
     {
       "path": "textures/*",

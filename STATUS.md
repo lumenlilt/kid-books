@@ -43,12 +43,15 @@
   剩下最陽春的是**書本封面**（等 AI 圖）。
 - **貓 v3**（2026-09-13，D33，已部署）：使用者說 v2 很奇怪 → metaball 絨毛玩偶、臉貼表面、尖耳；圖示重渲染。
   **使用者看過 v3 仍裁示不行 → 改「使用者出概念圖、我照圖建模」**，規格在 `art/BRIEF.md`〈貓（吉祥物）概念圖〉。
+- **貓 v5**（2026-09-13，D34，**未部署**）：使用者出了三視圖概念圖 → 乾淨零件＋解析投影貼片重建（`tools/blender/cat.py`），
+  圖示重渲染；比對圖 `cat-v5-review-sheet.png` 已交給使用者。**等使用者點頭才 `npx wrangler deploy`**。
+  順手加了 dev 截圖收件匣（`__kb.dbg.snapshot('name')` → `.shots/name.png`），之後看畫面、出 README 截圖都用它。
 
 ## 下一步
 
 1. **等使用者**：(a) Azure 金鑰重產 → 我產四段聲線樣本讓他選 → 全量重產 → 重新部署；
    (b) Cloudflare dashboard 關掉 Web Analytics 自動注入與 NEL（`check-site.sh` 會亮紅直到關掉）；
-   (c) 依 `art/BRIEF.md` 出第一批 AI 圖放 `art/incoming/`；**(c′) 貓的概念圖 `cat-front.png`＋`cat-side.png`（或 Meshy／Tripo 出的 cat.glb）**；
+   (c) 依 `art/BRIEF.md` 出第一批 AI 圖放 `art/incoming/`；~~(c′) 貓的概念圖~~ 已收到、v5 建好，**等使用者看比對圖裁示：直接部署／再修哪裡**；
    (e) ~~KayKit~~ 擺設已全部自製，不用下載了；
    (d) 看過玩具風成品，決定再修哪裡（候選：頁與頁的翻頁動畫、鐘樓構圖、點數字讓指針走過去、直向控制區、貓的造型）。
 2. 使用者用 iPad Safari 開 https://books.lumenlilt.app 實際玩一遍（加入主畫面），回報手感、台詞、聲音。
@@ -59,3 +62,14 @@
 
 - Azure Speech 金鑰：`profit/config/azure-speech.json` 那把回 401；使用者說要去重產。
 - Cloudflare zone 開關：Web Analytics 自動注入、Network Error Logging——只有 dashboard 關得掉。
+
+---
+
+## 自動記錄的狀態
+
+<!-- HANDOFF-AUTO:BEGIN -->
+<!-- state:main|ce4227f|dirty -->
+> ⚠️ 這一段由 `harness/hooks/status-handoff.py` 自己寫，不要手改。
+
+更新於 **2026-09-13 00:54**｜分支 `main`｜HEAD `ce4227f` art/BRIEF：貓的概念圖規格；STATUS：等使用者出圖再照圖建模｜工作樹：**有未提交的改動**（`git status --short`）
+<!-- HANDOFF-AUTO:END -->

@@ -56,7 +56,7 @@ fill.data.energy = 120
 fill.data.size = 4
 
 # 相機：貓的臉在 +Y（cat.py 的前方），所以相機要放 +Y 那側往 -Y 看；2026-09-12 第一版放 -Y 側，渲染出來是背影。
-bpy.ops.object.camera_add(location=(0, -2.1, 0.85), rotation=(math.radians(80), 0, 0))  # v3 臉在 -Y：相機放 -Y 側往 +Y 看
+bpy.ops.object.camera_add(location=(0, -2.5, 0.6), rotation=(math.radians(88), 0, 0))  # 臉在 -Y：相機放 -Y 側往 +Y 看；v5 全身高 1.14，退遠一點才裝得下耳尖
 cam = bpy.context.active_object
 cam.data.lens = 70
 scene.camera = cam

@@ -224,7 +224,7 @@ const timer = new Timer();
 let frames = 0;
 let fpsAt = 0;
 let fps = 0;
-const dbg = { frame: 0, lastError: null as unknown };
+const dbg: { frame: number; lastError: unknown; snapshot?: (name: string) => Promise<string> } = { frame: 0, lastError: null };
 if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene, narrator, overlay, store, picker, cuckoo, audio };
 const frame = (forcedDt?: number, render = true) => {
   dbg.frame += 1;
@@ -259,6 +259,11 @@ const frame = (forcedDt?: number, render = true) => {
       debugPanel.textContent = `fps ${fps.toFixed(0)}  calls ${calls}  tris ${triangles}  book ${books.state}\n${vp.width}x${vp.height}@${vp.dpr}  palette ${palette.name}  hour ${hour.toFixed(1)}`;
     }
   }
+};
+if (debug) dbg.snapshot = async (name) => {
+  frame(0, true); // 同一個 task 裡先畫一幀再讀：drawing buffer 要到 task 結束才會被交換掉
+  const res = await fetch(`/__shot?name=${encodeURIComponent(name)}`, { method: 'POST', body: renderer.domElement.toDataURL('image/png') });
+  return res.text();
 };
 renderer.setAnimationLoop(() => frame());
 // 除錯用：分頁被隱藏時瀏覽器不給 rAF、計時器也被節流到每秒一次，動畫序列會凍住；
