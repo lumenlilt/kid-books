@@ -125,3 +125,8 @@ KayKit Furniture Bits（CC0）itch.io 的下載流程擋腳本（invalid key）�
 `tools/blender/window.py`（厚窗框、十字窗格、外框線板＋山形頂、深窗台、花箱）。共用 `tools/blender/_toy.py`（bevel＋依角度平滑、弧頂板）。
 模型只帶材質名（Wood／WoodDark／Inner／Trim、Frame／Sill／Casing／Box／Flower／Leaf），three.js 依色板染色、木紋貼圖照套——換色板不用重出模型。
 格位數字仍在 bookcase.ts（D19），模型照數字建。踩坑：`transform_apply` 會把位置烤進頂點，弧頂板的位移要用 += 不是 =。
+
+### D31 其餘擺設也改 Blender 建模（2026-09-13）
+邊桌（圓桌面、三隻外八腳、下層小圓盤）、落地燈（圓底座、燈罩、頂飾）、盆栽（六片槳葉）、小熊（蝴蝶結）、收音機（格柵、旋鈕、天線）、書堆。
+一個擺設一個 GLB（`tools/blender/props.py <name>`）：匯出會把位置烤進頂點，同一檔多個擺設會帶著間距。
+材質名染色板，木紋照套。KayKit 因此不再需要（使用者若放進來也可再評估）。

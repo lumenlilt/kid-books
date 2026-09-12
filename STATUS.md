@@ -38,13 +38,14 @@
 - **美術第三輪**（2026-09-13，D29，已部署）：Poly Haven CC0 貼圖（地板／牆／地毯／木紋）、3/4 構圖、更強主光。
   KayKit 家具包腳本下載不到（itch.io key 檢查），**請使用者手動下載免費版放 `art/incoming/`**。
 - **美術第四輪**（2026-09-13，D30，已部署）：書架與窗戶改 Blender 建模（腳本可重生、材質名染色板）。
+- **美術第五輪**（2026-09-13，D31，已部署）：邊桌、落地燈、盆栽、小熊、收音機、書堆改 Blender 建模；KayKit 不再需要。
 
 ## 下一步
 
 1. **等使用者**：(a) Azure 金鑰重產 → 我產四段聲線樣本讓他選 → 全量重產 → 重新部署；
    (b) Cloudflare dashboard 關掉 Web Analytics 自動注入與 NEL（`check-site.sh` 會亮紅直到關掉）；
    (c) 依 `art/BRIEF.md` 出第一批 AI 圖放 `art/incoming/`；
-   (e) 到 https://kaylousberg.itch.io/furniture-bits 按 Download → No thanks → 下載免費版 zip 放 `art/incoming/`（CC0，3.6 MB）；
+   (e) ~~KayKit~~ 擺設已全部自製，不用下載了；
    (d) 看過玩具風成品，決定再修哪裡（候選：頁與頁的翻頁動畫、鐘樓構圖、點數字讓指針走過去、直向控制區、貓的造型）。
 2. 使用者用 iPad Safari 開 https://books.lumenlilt.app 實際玩一遍（加入主畫面），回報手感、台詞、聲音。
 3. 自家小孩實測（M3 就該排的）：我出 10 分鐘觀察表。

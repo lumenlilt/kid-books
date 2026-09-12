@@ -64,6 +64,28 @@ def cylinder(name: str, r: float, depth: float, loc, mat, rot=(0, 0, 0), verts: 
     return o
 
 
+def cone(name: str, r1: float, r2: float, depth: float, loc, mat, rot=(0, 0, 0), verts: int = 28, bevel: float = 0.01, parent=None):
+    bpy.ops.mesh.primitive_cone_add(radius1=r1, radius2=r2, depth=depth, location=loc, rotation=rot, vertices=verts)
+    o = bpy.context.active_object
+    o.name = name
+    o.data.materials.append(mat)
+    finish(o, bevel, 2)
+    if parent:
+        set_parent(o, parent)
+    return o
+
+
+def torus(name: str, major: float, minor: float, loc, mat, rot=(0, 0, 0), parent=None):
+    bpy.ops.mesh.primitive_torus_add(major_radius=major, minor_radius=minor, location=loc, rotation=rot, major_segments=32, minor_segments=12)
+    o = bpy.context.active_object
+    o.name = name
+    o.data.materials.append(mat)
+    bpy.ops.object.shade_smooth()
+    if parent:
+        set_parent(o, parent)
+    return o
+
+
 def sphere(name: str, r: float, loc, mat, scale=(1, 1, 1), parent=None):
     bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc, segments=24, ring_count=16)
     o = bpy.context.active_object

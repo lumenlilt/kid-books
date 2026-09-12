@@ -54,6 +54,15 @@
       "url": "https://github.com/lumenlilt/kid-books",
       "retrieved": "2026-09-13",
       "modified": "Blender 5.2 bpy 程序建模輸出 GLB，可由腳本重生"
+    },
+    {
+      "path": "models/prop-*.glb",
+      "pack": "魔法書房原創：房間擺設（tools/blender/props.py 生成）",
+      "author": "Lumenlilt",
+      "license": "CC-BY-4.0",
+      "url": "https://github.com/lumenlilt/kid-books",
+      "retrieved": "2026-09-13",
+      "modified": "Blender 5.2 bpy 程序建模輸出 GLB，可由腳本重生"
     }
   ]
 }

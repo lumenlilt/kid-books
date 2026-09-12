@@ -11,3 +11,4 @@
 | Poly Haven textures（plank_flooring_02、beige_wall_001、curly_teddy_natural、brown_planks_04） | Poly Haven contributors | CC0-1.0 | <https://polyhaven.com/textures> | `textures/*` |
 | 魔法書房原創：書架 v2（tools/blender/bookcase.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/bookcase.glb` |
 | 魔法書房原創：窗戶 v2（tools/blender/window.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/window.glb` |
+| 魔法書房原創：房間擺設（tools/blender/props.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/prop-*.glb` |
