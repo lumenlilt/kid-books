@@ -20,7 +20,7 @@ cat_py = Path(__file__).resolve().parent / "cat.py"
 _tmp = tempfile.NamedTemporaryFile(suffix=".glb", delete=False).name
 _saved_argv = sys.argv
 sys.argv = ["blender", "--", _tmp]
-exec(compile(cat_py.read_text(encoding="utf-8"), str(cat_py), "exec"), {"__name__": "cat_build"})  # 獨立命名空間，別讓 cat.py 的 OUT 蓋掉這裡的
+exec(compile(cat_py.read_text(encoding="utf-8"), str(cat_py), "exec"), {"__name__": "cat_build", "__file__": str(cat_py)})  # 獨立命名空間，別讓 cat.py 的 OUT 蓋掉這裡的；__file__ 給 cat.py 找 _toy
 sys.argv = _saved_argv
 bpy.ops.object.select_all(action="DESELECT")
 scene = bpy.context.scene
@@ -44,19 +44,19 @@ bg.inputs[1].default_value = 0.35  # 世界光只當微弱環境光：太亮會�
 scene.world = world
 
 # 燈
-bpy.ops.object.light_add(type="SUN", location=(3, 4, 6))
+bpy.ops.object.light_add(type="SUN", location=(3, -4, 6))
 sun = bpy.context.active_object
 sun.data.energy = 3.0
-sun.rotation_euler = (math.radians(-50), math.radians(10), math.radians(-35))
-bpy.ops.object.light_add(type="AREA", location=(-3, 3, 3))
+sun.rotation_euler = (math.radians(50), math.radians(10), math.radians(35))
+bpy.ops.object.light_add(type="AREA", location=(-3, -3, 3))
 fill_obj = bpy.context.active_object
-fill_obj.rotation_euler = (math.radians(-55), 0, math.radians(-40))
+fill_obj.rotation_euler = (math.radians(55), 0, math.radians(-40))
 fill = fill_obj
 fill.data.energy = 120
 fill.data.size = 4
 
 # 相機：貓的臉在 +Y（cat.py 的前方），所以相機要放 +Y 那側往 -Y 看；2026-09-12 第一版放 -Y 側，渲染出來是背影。
-bpy.ops.object.camera_add(location=(0, 2.1, 0.85), rotation=(math.radians(80), 0, math.radians(180)))
+bpy.ops.object.camera_add(location=(0, -2.1, 0.85), rotation=(math.radians(80), 0, 0))  # v3 臉在 -Y：相機放 -Y 側往 +Y 看
 cam = bpy.context.active_object
 cam.data.lens = 70
 scene.camera = cam

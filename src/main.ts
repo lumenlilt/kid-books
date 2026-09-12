@@ -68,7 +68,7 @@ scene.add(shelf.group);
 
 const cat = await createCat(palette.accent);
 cat.group.position.set(bookcase.group.position.x + 0.5, bookcase.top.y, bookcase.group.position.z - 0.04);
-cat.group.rotation.y = Math.PI - 0.3; // Blender +Y 前方在 glTF 是 -Z，轉過來面對鏡頭
+cat.group.rotation.y = -0.3; // v3 的臉建在 Blender -Y（glTF +Z），本來就面對鏡頭，只微微側身
 cat.setHome();
 scene.add(cat.group);
 

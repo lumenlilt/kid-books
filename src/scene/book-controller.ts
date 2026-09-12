@@ -119,7 +119,7 @@ export function createBookController(d: BookControllerDeps): BookController {
   function catPerch(): { position: Vector3; rotationY: number } {
     if (!book) return { position: new Vector3(), rotationY: 0 };
     const local = new Vector3(book.pageW - 0.08, -book.pageH / 2 + 0.12, book.thick / 2);
-    return { position: book.group.localToWorld(local), rotationY: Math.PI - 0.25 };
+    return { position: book.group.localToWorld(local), rotationY: -0.25 };
   }
 
   async function open(bookId: string): Promise<void> {
