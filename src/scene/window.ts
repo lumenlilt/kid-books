@@ -1,5 +1,6 @@
-import { CircleGeometry, Color, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape } from 'three';
-import { paper, roundedBox } from './materials';
+import { CircleGeometry, Color, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Shape } from 'three';
+import { loadModel } from './assets';
+import { paper, texturedToy } from './materials';
 import type { Palette } from './palette';
 
 /** 窗戶：天色與日月跟著裝置的真實時間走——這本身就是時鐘書的伏筆。 */
@@ -38,21 +39,26 @@ export function nightAmountAt(hour: number): number {
 
 export function createWindow(palette: Palette, width = 1.0, height = 1.15): RoomWindow {
   const g = new Group();
-  const frame = paper(palette.paper, { flat: false });
-  const t = 0.06;
-  const depth = 0.08;
-  const bar = (sx: number, sy: number, x: number, y: number) => {
-    const m = new Mesh(roundedBox(sx, sy, depth), frame);
-    m.position.set(x, y, 0);
-    m.castShadow = true;
-    g.add(m);
+  // 窗框、線板、窗台、花箱：tools/blender/window.py 的模型（D30），依材質名染色板色
+  const mats: Record<string, MeshStandardMaterial> = {
+    Frame: paper(palette.paper, { roughness: 0.6 }),
+    Sill: texturedToy('wood', palette.wood, { repeat: 2, roughness: 0.75, normalScale: 0.4, gain: 2.4 }),
+    Casing: paper(palette.wallTrim, { roughness: 0.7 }),
+    Box: paper(palette.woodDark, { roughness: 0.8 }),
+    Flower: paper(palette.accent, { roughness: 0.55 }),
+    Leaf: paper(0x6fbf73, { roughness: 0.7 }),
   };
-  bar(width + t, t, 0, height / 2);
-  bar(width + t, t, 0, -height / 2);
-  bar(t, height, -width / 2, 0);
-  bar(t, height, width / 2, 0);
-  bar(t * 0.7, height, 0, 0);
-  bar(width, t * 0.7, 0, 0);
+  void loadModel('/assets/models/window.glb').then((model) => {
+    model.traverse((o) => {
+      if (o instanceof Mesh && !Array.isArray(o.material)) {
+        const m = mats[o.material.name];
+        if (m) o.material = m;
+        o.castShadow = true;
+        o.receiveShadow = true;
+      }
+    });
+    g.add(model);
+  });
 
   const skyMat = new MeshBasicMaterial({ color: 0x9fd3ff });
   const sky = new Mesh(new PlaneGeometry(width, height), skyMat);
@@ -96,10 +102,6 @@ export function createWindow(palette: Palette, width = 1.0, height = 1.15): Room
   clouds[1]?.position.set(0.25, height * 0.05, -0.026);
   for (const c of clouds) g.add(c);
 
-  const sill = new Mesh(roundedBox(width + 0.2, 0.05, 0.16), paper(palette.wood));
-  sill.position.set(0, -height / 2 - 0.05, 0.04);
-  sill.castShadow = true;
-  g.add(sill);
 
   let elapsed = 0;
   return {

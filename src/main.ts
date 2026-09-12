@@ -67,7 +67,7 @@ shelf.group.position.copy(bookcase.group.position);
 scene.add(shelf.group);
 
 const cat = await createCat(palette.accent);
-cat.group.position.set(bookcase.group.position.x + 0.5, bookcase.top.y, bookcase.group.position.z + 0.02);
+cat.group.position.set(bookcase.group.position.x + 0.5, bookcase.top.y, bookcase.group.position.z - 0.04);
 cat.group.rotation.y = Math.PI - 0.3; // Blender +Y 前方在 glTF 是 -Z，轉過來面對鏡頭
 cat.setHome();
 scene.add(cat.group);

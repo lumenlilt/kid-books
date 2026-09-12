@@ -119,3 +119,9 @@ GTAO 預設開（?ao=0 關）。Kenney 低多邊形擺設風格對不上，換�
 顏色仍由色板 tint，貼圖只給紋理（換色板不用換圖）；貼圖平均亮度會拉暗，材質加 gain 抬回。鏡頭改 3/4 俯視、前景有落地燈與桌子、主光加強、補光帶藍。
 標尺：Toca Boca（Toca Life World）——4 到 7 歲最愛、也是 3D 最容易做好的風格。
 KayKit Furniture Bits（CC0）itch.io 的下載流程擋腳本（invalid key），改請使用者手動下載放 art/incoming/；GitHub 沒有該包的鏡像。
+
+### D30 書架與窗戶改 Blender 建模（2026-09-13）
+書架是畫面主角卻是「板子拼的框」；改用 `tools/blender/bookcase.py`（厚圓邊側板、弧頂冠板、底座圓腳、層板前唇、淺色內裡、強調色飾條與圓釘）與
+`tools/blender/window.py`（厚窗框、十字窗格、外框線板＋山形頂、深窗台、花箱）。共用 `tools/blender/_toy.py`（bevel＋依角度平滑、弧頂板）。
+模型只帶材質名（Wood／WoodDark／Inner／Trim、Frame／Sill／Casing／Box／Flower／Leaf），three.js 依色板染色、木紋貼圖照套——換色板不用重出模型。
+格位數字仍在 bookcase.ts（D19），模型照數字建。踩坑：`transform_apply` 會把位置烤進頂點，弧頂板的位移要用 += 不是 =。
