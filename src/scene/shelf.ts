@@ -45,8 +45,9 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
   entries.slice(0, bookcase.slots.length).forEach((entry, i) => {
     const slot = bookcase.slots[i];
     if (!slot) return;
-    const cover = makeCoverTexture({ color: entry.color, icon: entry.icon, title: entry.title, locked: entry.locked, ink: hex(palette.ink), paper: hex(palette.paper) });
-    const side = paper(entry.locked ? 0x8f8f8f : 0xfff6e5, { flat: false });
+    const patterns = ['dots', 'stripes', 'stars'] as const;
+    const cover = makeCoverTexture({ color: entry.color, icon: entry.icon, title: entry.title, locked: entry.locked, ink: hex(palette.ink), paper: hex(palette.paper), pattern: patterns[i % patterns.length] });
+    const side = paper(entry.locked ? 0xb9b3ad : parseInt(entry.color.slice(1), 16), { flat: false });
     const pages = paper(0xfdf5e6, { flat: false });
     const front = new MeshStandardMaterial({ map: cover, roughness: 0.9, metalness: 0 });
     // BoxGeometry 材質順序：+x, -x, +y, -y, +z(正面), -z

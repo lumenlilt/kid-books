@@ -21,6 +21,7 @@ import { createCameraRig } from './scene/camera-rig';
 import { createCat } from './scene/cat';
 import { createLights } from './scene/lights';
 import { hex, resolvePalette } from './scene/palette';
+import { createPostFx } from './scene/postfx';
 import { createRenderer } from './scene/renderer';
 import { createRoom } from './scene/room';
 import { createShelf } from './scene/shelf';
@@ -41,14 +42,17 @@ document.documentElement.style.setProperty('--accent', hex(palette.accent));
 const renderer = createRenderer({ canvas });
 const camera = new PerspectiveCamera(38, 1, 0.1, 100);
 const layout = createLayout(renderer, camera, canvas);
+const useAo = params.get('ao') === '1';
 const rig = createCameraRig(camera);
 const input = createInput(canvas, camera);
 
 const scene = new Scene();
 scene.background = new Color(palette.sky).multiplyScalar(0.9);
+const postfx = useAo ? createPostFx(renderer, scene, camera) : null;
+if (postfx) layout.onLayout((vp) => postfx.setSize(vp.width, vp.height, vp.dpr));
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches;
-const lights = createLights(scene, palette, isTouch ? 1024 : 2048);
+const lights = createLights(scene, palette, isTouch ? 1024 : 2048, renderer);
 
 const bookcase = createBookcase(palette);
 const room = createRoom(palette, bookcase.lowerShelf.y);
@@ -232,6 +236,7 @@ const frame = (forcedDt?: number, render = true) => {
   cat.update(dt);
   books.update(dt);
   cuckoo.update(dt);
+  room.update(dt);
   if (cuckoo.group.parent) {
     const now = new Date();
     cuckoo.setTime(now.getHours(), now.getMinutes());
@@ -239,7 +244,8 @@ const frame = (forcedDt?: number, render = true) => {
   rig.update(dt, input.pointer);
   if (!render) return;
   renderer.shadowMap.needsUpdate = true;
-  renderer.render(scene, camera);
+  if (postfx) postfx.render();
+  else renderer.render(scene, camera);
   if (debugPanel) {
     frames += 1;
     const now = performance.now() / 1000;

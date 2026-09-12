@@ -1,4 +1,4 @@
-import { BoxGeometry, CircleGeometry, ConeGeometry, CylinderGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, type BufferGeometry, type Material } from 'three';
+import { BoxGeometry, CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, type BufferGeometry, type Material } from 'three';
 import { segment } from '../../lib/fit-rect';
 import { paper } from '../materials';
 import { skyColorAt } from '../window';
@@ -36,18 +36,84 @@ export function createClockStage(): ClockStage {
     return m;
   };
 
-  // 地面：平貼頁面、不立起
+  // 地面：平貼頁面、不立起；一條小徑從小屋到鐘樓
   const ground = mesh(geo(new PlaneGeometry(1.16, 0.62)), mat(paper(0x9fd39a, { flat: false })));
   ground.position.set(0, 0.02, 0.004);
   g.add(ground);
+  const path = mesh(geo(new PlaneGeometry(0.16, 0.5)), mat(paper(0xf1dfb8, { flat: false })));
+  path.position.set(-0.15, 0.0, 0.006);
+  path.rotation.z = -0.55;
+  g.add(path);
 
-  // 天空卡（後層）
+  // 接地陰影：放在會立起的紙片底下，柔和的深色橢圓（貼圖）
+  const shadowTex = (() => {
+    const c = document.createElement('canvas');
+    c.width = 128;
+    c.height = 64;
+    const ctx = c.getContext('2d');
+    if (ctx) {
+      const grd = ctx.createRadialGradient(64, 32, 4, 64, 32, 60);
+      grd.addColorStop(0, 'rgba(40,25,20,0.35)');
+      grd.addColorStop(1, 'rgba(40,25,20,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, 128, 64);
+    }
+    return new CanvasTexture(c);
+  })();
+  const contact = (x: number, y: number, w: number) => {
+    const m = new Mesh(geo(new PlaneGeometry(w, w * 0.4)), mat(new MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })));
+    m.position.set(x, y, 0.0055);
+    g.add(m);
+  };
+  contact(0.12, 0.12, 0.5);
+  contact(-0.36, -0.2, 0.42);
+
+  // 天空卡（後層）：圓角紙卡＋兩層山丘＋雲
   const back = new Group();
   back.position.set(0, 0.42, 0.006);
   const skyMat = mat(new MeshBasicMaterial({ color: 0x9fd3ff }));
-  const sky = mesh(geo(new PlaneGeometry(1.16, 0.72)), skyMat);
-  sky.position.set(0, 0.36, 0);
+  const skyShape = new Shape();
+  const sw = 1.16;
+  const sh = 0.72;
+  const r = 0.12;
+  skyShape.moveTo(-sw / 2, 0);
+  skyShape.lineTo(sw / 2, 0);
+  skyShape.lineTo(sw / 2, sh - r);
+  skyShape.quadraticCurveTo(sw / 2, sh, sw / 2 - r, sh);
+  skyShape.lineTo(-sw / 2 + r, sh);
+  skyShape.quadraticCurveTo(-sw / 2, sh, -sw / 2, sh - r);
+  skyShape.closePath();
+  const sky = mesh(geo(new ExtrudeGeometry(skyShape, { depth: 0.012, bevelEnabled: false })), skyMat);
+  sky.position.set(0, 0, -0.012);
   back.add(sky);
+  const hill = (w: number, h: number, color: number, x: number, z: number) => {
+    const hs = new Shape();
+    hs.moveTo(-w / 2, 0);
+    hs.quadraticCurveTo(-w / 4, h, 0, h * 0.85);
+    hs.quadraticCurveTo(w / 4, h * 1.05, w / 2, 0);
+    hs.closePath();
+    const m = mesh(geo(new ExtrudeGeometry(hs, { depth: 0.01, bevelEnabled: false })), mat(paper(color, { flat: false })));
+    m.position.set(x, 0, z);
+    back.add(m);
+  };
+  hill(1.0, 0.26, 0x8fcf8a, 0.2, 0.004);
+  hill(0.8, 0.2, 0x5fae74, -0.3, 0.012);
+  const cloudGeo = (w: number) => {
+    const cs = new Shape();
+    cs.moveTo(-w / 2, 0);
+    cs.absarc(-w * 0.28, 0.01, w * 0.2, Math.PI, Math.PI * 1.9, false);
+    cs.absarc(0, 0.04, w * 0.26, Math.PI * 1.1, Math.PI * 1.95, false);
+    cs.absarc(w * 0.28, 0.01, w * 0.2, Math.PI * 1.15, Math.PI * 2, false);
+    cs.lineTo(w / 2, 0);
+    cs.closePath();
+    return geo(new ExtrudeGeometry(cs, { depth: 0.008, bevelEnabled: false }));
+  };
+  const cloudMat = mat(paper(0xffffff, { flat: false }));
+  const cloudA = mesh(cloudGeo(0.26), cloudMat);
+  cloudA.position.set(-0.32, 0.5, 0.006);
+  const cloudB = mesh(cloudGeo(0.2), cloudMat);
+  cloudB.position.set(0.3, 0.42, 0.006);
+  back.add(cloudA, cloudB);
   const sun = mesh(geo(new CircleGeometry(0.075, 24)), mat(new MeshBasicMaterial({ color: 0xfff0a0 })));
   sun.position.set(-0.35, 0.5, 0.004);
   back.add(sun);
@@ -67,6 +133,20 @@ export function createClockStage(): ClockStage {
   roof.position.set(0, 0.64, 0);
   roof.rotation.y = Math.PI / 4;
   mid.add(roof);
+  const towerDoor = mesh(geo(new BoxGeometry(0.09, 0.14, 0.012)), mat(paper(0x8a5a3c, { flat: false })));
+  towerDoor.position.set(0, 0.07, 0.034);
+  mid.add(towerDoor);
+  for (const wx of [-0.08, 0.08]) {
+    const win = mesh(geo(new BoxGeometry(0.05, 0.06, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+    win.position.set(wx, 0.2, 0.034);
+    mid.add(win);
+  }
+  const pole = mesh(geo(new CylinderGeometry(0.006, 0.006, 0.12, 6)), mat(paper(0x3a2e2a, { flat: false })));
+  pole.position.set(0, 0.78, 0);
+  mid.add(pole);
+  const flag = mesh(geo(new BoxGeometry(0.07, 0.045, 0.006)), mat(paper(0xffd45a, { flat: false })));
+  flag.position.set(0.04, 0.81, 0);
+  mid.add(flag);
   const face = mesh(geo(new CylinderGeometry(0.115, 0.115, 0.02, 32)), mat(paper(0xfffdf5, { flat: false })));
   face.rotation.x = Math.PI / 2;
   face.position.set(0, 0.36, 0.04);
@@ -112,6 +192,12 @@ export function createClockStage(): ClockStage {
   const door = mesh(geo(new BoxGeometry(0.06, 0.1, 0.01)), mat(paper(0x8a5a3c, { flat: false })));
   door.position.set(0.04, 0.05, 0.034);
   front.add(door);
+  const houseWin = mesh(geo(new BoxGeometry(0.05, 0.05, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+  houseWin.position.set(-0.06, 0.11, 0.034);
+  front.add(houseWin);
+  const chimney = mesh(geo(new BoxGeometry(0.04, 0.09, 0.04)), mat(paper(0xb5654a)));
+  chimney.position.set(-0.08, 0.27, 0);
+  front.add(chimney);
   const bush = mesh(geo(new CylinderGeometry(0.07, 0.09, 0.09, 8)), mat(paper(0x7cc76f)));
   bush.position.set(0.55, 0.045, 0);
   front.add(bush);

@@ -1,4 +1,4 @@
-import { BoxGeometry, CircleGeometry, Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { BoxGeometry, CircleGeometry, Color, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape } from 'three';
 import { paper } from './materials';
 import type { Palette } from './palette';
 
@@ -6,6 +6,7 @@ import type { Palette } from './palette';
 export interface RoomWindow {
   group: Group;
   setHour(hour: number): void;
+  update(dt: number): void;
 }
 
 const KEYS: Array<[number, number]> = [
@@ -65,13 +66,51 @@ export function createWindow(palette: Palette, width = 1.0, height = 1.15): Room
   moon.position.z = -0.02;
   g.add(moon);
 
+  // 窗外：兩層紙雕山丘＋兩朵慢慢飄的雲（都在窗框範圍內、貼在天空前面）
+  const hill = (w: number, h: number, color: number, x: number, y: number, z: number) => {
+    const sh = new Shape();
+    sh.moveTo(-w / 2, 0);
+    sh.quadraticCurveTo(-w / 4, h, 0, h * 0.8);
+    sh.quadraticCurveTo(w / 4, h * 1.1, w / 2, 0);
+    sh.closePath();
+    const m = new Mesh(new ExtrudeGeometry(sh, { depth: 0.01, bevelEnabled: false }), new MeshBasicMaterial({ color }));
+    m.position.set(x, y, z);
+    g.add(m);
+    return m;
+  };
+  hill(1.3, 0.34, 0x8fcf8a, 0.15, -height / 2 + 0.02, -0.028);
+  hill(1.0, 0.26, 0x5fae74, -0.25, -height / 2 + 0.02, -0.024);
+  const cloudMat = new MeshBasicMaterial({ color: 0xffffff });
+  const cloudGeo = (w: number) => {
+    const sh = new Shape();
+    sh.moveTo(-w / 2, 0);
+    sh.absarc(-w * 0.28, 0.01, w * 0.2, Math.PI, Math.PI * 1.9, false);
+    sh.absarc(0, 0.04, w * 0.26, Math.PI * 1.1, Math.PI * 1.95, false);
+    sh.absarc(w * 0.28, 0.01, w * 0.2, Math.PI * 1.15, Math.PI * 2, false);
+    sh.lineTo(w / 2, 0);
+    sh.closePath();
+    return new ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: false });
+  };
+  const clouds = [new Mesh(cloudGeo(0.3), cloudMat), new Mesh(cloudGeo(0.22), cloudMat)];
+  clouds[0]?.position.set(-0.2, height * 0.22, -0.026);
+  clouds[1]?.position.set(0.25, height * 0.05, -0.026);
+  for (const c of clouds) g.add(c);
+
   const sill = new Mesh(new BoxGeometry(width + 0.2, 0.05, 0.16), paper(palette.wood));
   sill.position.set(0, -height / 2 - 0.05, 0.04);
   sill.castShadow = true;
   g.add(sill);
 
+  let elapsed = 0;
   return {
     group: g,
+    update(dt) {
+      elapsed += dt;
+      clouds.forEach((c, i) => {
+        const base = i === 0 ? -0.2 : 0.25;
+        c.position.x = base + Math.sin(elapsed * 0.08 + i * 2) * 0.12;
+      });
+    },
     setHour(hour) {
       skyMat.color.copy(skyColorAt(hour));
       // 太陽 6→18 走一道弧；月亮 18→6

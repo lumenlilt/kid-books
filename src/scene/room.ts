@@ -1,5 +1,7 @@
 import { Box3, BoxGeometry, EdgesGeometry, Group, LineDashedMaterial, LineSegments, Mesh, MeshStandardMaterial, PlaneGeometry, Vector3, type Object3D } from 'three';
 import { loadModel, modelUrl } from './assets';
+import { createDecor, type Decor } from './decor';
+import { woodFloorTexture } from './decor';
 import { paper } from './materials';
 import type { Palette } from './palette';
 import { createWindow, type RoomWindow } from './window';
@@ -20,6 +22,7 @@ export interface Room {
   ready: Promise<void>;
   /** 把裝飾放進空位（剪影隱藏）；傳 null 清空回剪影 */
   setDecoration(slotId: string, object: Object3D | null): void;
+  update(dt: number): void;
 }
 
 const _box = new Box3();
@@ -52,7 +55,9 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
   const g = new Group();
   const props = new Map<string, Object3D>();
 
-  const floor = new Mesh(new PlaneGeometry(9, 9), paper(palette.floor, { flat: false }));
+  const floorMat = paper(palette.floor, { flat: false });
+  floorMat.map = woodFloorTexture(palette);
+  const floor = new Mesh(new PlaneGeometry(9, 9), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   g.add(floor);
@@ -79,6 +84,9 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
   const window = createWindow(palette);
   window.group.position.set(1.75, 1.85, -2.45);
   g.add(window.group);
+
+  const decor: Decor = createDecor(palette);
+  g.add(decor.group);
 
   // 裝飾空位：虛線剪影。空位是「這裡可以放什麼？」的問句。
   const slots: DecorationSlot[] = [];
@@ -109,10 +117,6 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
 
   const ready = (async () => {
     await Promise.all([
-      place('rugRound', 0.03, 0, 1.15).then((h) => {
-        h.scale.multiplyScalar(2.4);
-        tint(h, palette.rug);
-      }),
       place('lampRoundFloor', 1.45, -2.4, -0.7),
       place('sideTable', 0.55, -2.35, -1.7),
       place('pottedPlant', 0.95, 2.5, -1.7),
@@ -136,6 +140,10 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
     props,
     slots,
     ready,
+    update(dt) {
+      decor.update(dt);
+      window.update(dt);
+    },
     setDecoration(slotId, object) {
       const slot = slots.find((x) => x.id === slotId);
       if (!slot) return;

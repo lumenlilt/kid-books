@@ -1,4 +1,4 @@
-import { NoToneMapping, PCFShadowMap, SRGBColorSpace, WebGLRenderer } from 'three';
+import { NeutralToneMapping, SRGBColorSpace, VSMShadowMap, WebGLRenderer } from 'three';
 
 export interface RendererOptions {
   canvas: HTMLCanvasElement;
@@ -9,10 +9,12 @@ export interface RendererOptions {
 export function createRenderer({ canvas, maxPixelRatio = 2 }: RendererOptions): WebGLRenderer {
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   renderer.outputColorSpace = SRGBColorSpace;
-  // 粉彩紙藝不做色調映射：ACES 會把淺色壓灰。
-  renderer.toneMapping = NoToneMapping;
+  // Neutral（Khronos PBR Neutral）：保住粉彩的色相，只壓高光；ACES 會把淺色壓灰（D25）
+  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFShadowMap;
+  // VSM：可模糊的軟陰影，紙藝／玩具兩種風格都要軟影
+  renderer.shadowMap.type = VSMShadowMap;
   // 陰影只在場景變動時更新（呼叫端設 needsUpdate），靜態房間不必每幀重算。
   renderer.shadowMap.autoUpdate = false;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
