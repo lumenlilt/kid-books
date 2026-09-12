@@ -28,6 +28,9 @@
 - **M6 PWA＋部署完成**（2026-09-12）：manifest、Blender 渲染的貓圖示、自製 service worker（70 檔 2.2 MB 預快取）、
   `wrangler deploy` → **https://books.lumenlilt.app 上線**，`check-site.sh` 標題／CSP／manifest 綠。
   首次部署抓到 Cloudflare zone 層級的 Web Analytics 自動注入（CSP 擋下）與 NEL 標頭——探針已寫進 check-site，**要使用者到 dashboard 關**。
+- **畫面商用化第一輪**（2026-09-12，commit 0d66393，已部署）：使用者裁示「還沒到商用」→ 先做風格無關的光影（VSM 軟陰影、三點光＋窗光、
+  RoomEnvironment、Neutral 色調、紙紋）與擺設（彩旗、窗簾、雲朵吊飾、海報、木地板、地毯、護牆板、窗外山丘雲）、封面圖樣、舞台細節；
+  `?ao=1` 可開 GTAO 比較。**風格（紙雕 vs 玩具）等使用者看實畫面裁示。**
 
 ## 下一步
 
