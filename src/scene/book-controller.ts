@@ -1,5 +1,12 @@
 import { PerspectiveCamera, Vector3, type Scene, type WebGLRenderer } from 'three';
+import { createActivity } from '../activities/registry';
+import type { Activity, ActivityContext } from '../activities/types';
 import { createBookFsm, type BookState } from '../app/book-fsm';
+import type { Narrator } from '../app/narrator';
+import type { BookDef } from '../content/schema';
+import { fromTotal } from '../lib/clock-math';
+import { burstStars } from '../overlay/stars';
+import { createClockSvg } from '../ui/clock-svg';
 import type { Input } from '../app/input';
 import { ndcBounds, solveFitDistance } from '../lib/fit-rect';
 import { easeInOutCubic, easeOutCubic, tween } from '../lib/tween';
@@ -24,11 +31,17 @@ export interface BookControllerDeps {
   viewport(): { width: number; height: number };
   hour: number;
   onReading?: (reading: boolean) => void;
+  narrator: Narrator;
+  books: Record<string, BookDef>;
+  hud: { setStars(n: number): void; starTarget: Element };
+  uiRoot: HTMLElement;
 }
 
 export interface BookController {
   readonly state: BookState;
   readonly current: ShelfBook | null;
+  readonly pageIndex: number;
+  readonly stars: number;
   open(bookId: string): Promise<void>;
   close(): Promise<void>;
   /** 視口變了：重算閱讀姿態與 DOM 矩形（只在 reading 時有事） */
@@ -51,6 +64,11 @@ export function createBookController(d: BookControllerDeps): BookController {
   let stage: ClockStage | null = null;
   const tmp = new Vector3();
   const corners: Vector3[] = [];
+  let bookDef: BookDef | null = null;
+  let pageIndex = -1;
+  let stars = 0;
+  let pageAbort: AbortController | null = null;
+  let activity: Activity | null = null;
 
   /** 用一台影子鏡頭試距離：整本書＋舞台都要在 NDC ±margin 內 */
   function solveReadingPose(): { position: Vector3; target: Vector3; fov: number } {
@@ -88,7 +106,7 @@ export function createBookController(d: BookControllerDeps): BookController {
       tmp.copy(p).project(d.camera);
       return { x: tmp.x, y: tmp.y };
     });
-    d.overlay.setRect(ndcBounds(pts, vp.width, vp.height));
+    d.overlay.setRect(ndcBounds(pts, vp.width, vp.height), vp);
   }
 
   function catPerch(): { position: Vector3; rotationY: number } {
@@ -99,8 +117,11 @@ export function createBookController(d: BookControllerDeps): BookController {
 
   async function open(bookId: string): Promise<void> {
     const sb = d.shelf.books.get(bookId);
-    if (!sb || sb.entry.locked || !fsm.send('TAP')) return;
+    const def = d.books[bookId];
+    if (!sb || !def || sb.entry.locked || !fsm.send('TAP')) return;
     current = sb;
+    bookDef = def;
+    d.narrator.setLines(def.lines);
     d.input.setEnabled(false);
     const mesh = sb.mesh;
 
@@ -168,12 +189,91 @@ export function createBookController(d: BookControllerDeps): BookController {
     const perch = catPerch();
     void d.cat.jumpTo(perch.position, perch.rotationY, 650, 0.62);
     d.input.setEnabled(true);
+    stars = 0;
+    d.hud.setStars(0);
+    void startPage(0);
+  }
+
+  function mirror(total: number): void {
+    const { h, m } = fromTotal(total);
+    stage?.setTime(h, m);
+    stage?.setHour(h + m / 60);
+  }
+
+  async function startPage(i: number): Promise<void> {
+    if (!bookDef || !stage || fsm.state !== 'reading') return;
+    const page = bookDef.pages[i];
+    if (!page) return;
+    pageAbort?.abort();
+    d.narrator.stop();
+    d.overlay.hideNext();
+    d.overlay.deck.replaceChildren();
+    pageIndex = i;
+    const ac = new AbortController();
+    pageAbort = ac;
+    const book = bookDef;
+    const st = stage;
+    const ctx: ActivityContext = {
+      book,
+      page,
+      deck: d.overlay.deck,
+      deckSize: d.overlay.deckSize,
+      stage: st,
+      narrator: d.narrator,
+      signal: ac.signal,
+      mirror,
+      totalStars: () => stars,
+      mountClock(opts = {}) {
+        const clock = createClockSvg();
+        const box = document.createElement('div');
+        box.className = 'clock-box';
+        box.style.setProperty('--frac', String(opts.frac ?? 0.92));
+        box.append(clock.el);
+        (opts.into ?? d.overlay.deck).append(box);
+        clock.setInteractive(opts.interactive ?? true);
+        clock.onChange((t) => mirror(t));
+        ac.signal.addEventListener('abort', () => clock.destroy(), { once: true });
+        mirror(clock.getTotal());
+        return clock;
+      },
+      complete: () => void completePage(page, i, ac.signal),
+      finish: () => void close(),
+    };
+    activity = createActivity(page.activity);
+    try {
+      await activity.mount(ctx);
+      for (const id of page.say) {
+        if (ac.signal.aborted) return;
+        await d.narrator.say(id);
+      }
+      if (ac.signal.aborted) return;
+      await activity.start();
+    } catch (err) {
+      if (!(err instanceof Error && err.message === 'aborted')) throw err;
+    }
+  }
+
+  async function completePage(page: BookDef['pages'][number], i: number, signal: AbortSignal): Promise<void> {
+    if (signal.aborted || !bookDef) return;
+    if (page.countsForCompletion) {
+      stars += 1;
+      const from = d.overlay.deck.firstElementChild ?? d.overlay.deck;
+      void burstStars(from, d.hud.starTarget, d.uiRoot).then(() => d.hud.setStars(stars));
+    }
+    if (page.doneSay) await d.narrator.say(page.doneSay);
+    if (signal.aborted) return;
+    if (i + 1 < bookDef.pages.length) d.overlay.showNext(() => void startPage(i + 1));
   }
 
   async function close(): Promise<void> {
     if (!book || !current || !fsm.send('CLOSE')) return;
     const mesh = current.mesh;
     d.input.setEnabled(false);
+    pageAbort?.abort();
+    pageAbort = null;
+    activity = null;
+    d.narrator.stop();
+    d.overlay.deck.replaceChildren();
     d.overlay.hide();
     d.onReading?.(false);
     void d.cat.jumpHome();
@@ -225,6 +325,12 @@ export function createBookController(d: BookControllerDeps): BookController {
     },
     get current() {
       return current;
+    },
+    get pageIndex() {
+      return pageIndex;
+    },
+    get stars() {
+      return stars;
     },
     open,
     close,

@@ -2,6 +2,8 @@ import ui from '../../content/ui.json';
 
 export interface Hud {
   root: HTMLElement;
+  /** 星星飛進去的那顆 */
+  starTarget: Element;
   setStars(n: number): void;
   setSound(on: boolean): void;
   onSoundToggle(fn: () => void): void;
@@ -42,8 +44,10 @@ export function createHud(container: HTMLElement): Hud {
   sound?.addEventListener('click', () => soundHandler());
   profile?.addEventListener('click', () => profileHandler());
   back?.addEventListener('click', () => backHandler());
+  const starTarget = root.querySelector('.hud-stars') ?? root;
   return {
     root,
+    starTarget,
     setStars(n) {
       if (count) count.textContent = String(n);
     },

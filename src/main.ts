@@ -1,6 +1,10 @@
 import './styles.css';
 import { Color, PerspectiveCamera, Scene, Timer } from 'three';
+import clockRaw from '../content/books/clock.json';
 import index from '../content/index.json';
+import { ACTIVITY_TYPES } from './activities/registry';
+import { createNarrator } from './app/narrator';
+import { validateBook } from './content/schema';
 import { createInput } from './app/input';
 import { createLayout } from './app/layout';
 import { tweens } from './lib/tween';
@@ -68,8 +72,12 @@ hud.onSoundToggle(() => {
 
 const overlay = createBookOverlay(ui);
 overlay.setDebug(debug);
+const clockBook = validateBook(clockRaw, ACTIVITY_TYPES);
+if (!clockBook.book) throw new Error(`content/books/clock.json: ${clockBook.errors.join('; ')}`);
+const narrator = createNarrator({ subtitle: overlay.subtitle, talking: (on) => cat.setTalking(on), speed: params.get('fast') === '1' ? 0.15 : 1 });
 const books = createBookController({
-  scene, camera, renderer, rig, input, shelf, cat, overlay, palette, hour,
+  scene, camera, renderer, rig, input, shelf, cat, overlay, palette, hour, narrator, hud, uiRoot: ui,
+  books: { clock: clockBook.book },
   viewport: () => layout.viewport,
   onReading: (on) => hud.setReading(on),
 });
@@ -120,8 +128,8 @@ let frames = 0;
 let fpsAt = 0;
 let fps = 0;
 const dbg = { frame: 0, lastError: null as unknown };
-if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene };
-const frame = (forcedDt?: number) => {
+if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene, narrator, overlay };
+const frame = (forcedDt?: number, render = true) => {
   dbg.frame += 1;
   layout.tick();
   timer.update();
@@ -130,6 +138,7 @@ const frame = (forcedDt?: number) => {
   cat.update(dt);
   books.update(dt);
   rig.update(dt, input.pointer);
+  if (!render) return;
   renderer.shadowMap.needsUpdate = true;
   renderer.render(scene, camera);
   if (debugPanel) {
@@ -148,7 +157,21 @@ const frame = (forcedDt?: number) => {
 renderer.setAnimationLoop(() => frame());
 // 除錯用：分頁被隱藏時瀏覽器不給 rAF、計時器也被節流到每秒一次，動畫序列會凍住；
 // 只在 ?debug=1 時，每次計時器觸發就用固定步長推進一秒份的幀，讓隱藏狀態下一秒還是一秒。
-if (debug) {
+// 更激進的除錯模式 ?turbo=1：分頁隱藏超過五分鐘後 Chrome 連計時器都改成每分鐘一次，
+// 只剩 MessageChannel 不受節流——用它推邏輯幀（不渲染），讓自動化測試在隱藏的 pane 裡也跑得完。
+if (params.get('turbo') === '1') {
+  const channel = new MessageChannel();
+  const pump = () => {
+    if (!document.hidden) return;
+    for (let i = 0; i < 4; i += 1) frame(1 / 30, false);
+    channel.port2.postMessage(0);
+  };
+  channel.port1.onmessage = pump;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) channel.port2.postMessage(0);
+  });
+  if (document.hidden) channel.port2.postMessage(0);
+} else if (debug) {
   let last = performance.now();
   window.setInterval(() => {
     const now = performance.now();

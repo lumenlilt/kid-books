@@ -1,0 +1,400 @@
+{
+  "lines": {
+    "clock.intro": {
+      "file": "audio/clock/intro.mp3",
+      "textSha256": "05d61bbdefdef6c0d1528f5d3a4163ea73907f737b20888951217d599ca5b01e",
+      "hash": "348f5afeb8b545b9",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:43+00:00",
+      "durationMs": 7467
+    },
+    "clock.p1.free": {
+      "file": "audio/clock/p1.free.mp3",
+      "textSha256": "bc2a3ef4e872cf9309c83753678fb32f592d5c098b71d989c0fc6d3a6fa83920",
+      "hash": "9628305180da742a",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:44+00:00",
+      "durationMs": 5977
+    },
+    "clock.p1.done": {
+      "file": "audio/clock/p1.done.mp3",
+      "textSha256": "7b371ea0c0cce517533a4178bec1a5c60bf47170be34255965a2a12a45bbde0b",
+      "hash": "4eadde37a3fcd17a",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:44+00:00",
+      "durationMs": 4257
+    },
+    "clock.p2.intro": {
+      "file": "audio/clock/p2.intro.mp3",
+      "textSha256": "295e3d0c49d2ac77759ed4a2cdb6df2611e308af14c97bd6732bc63b5de512a0",
+      "hash": "a783ee2b34cd0470",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:45+00:00",
+      "durationMs": 5557
+    },
+    "clock.p2.task.3": {
+      "file": "audio/clock/p2.task.3.mp3",
+      "textSha256": "58c87edfd3fdd5405bf1bc3f310fedd14f7553076dac76ad1f9480ef83e0fc54",
+      "hash": "f149bedbebea6396",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:45+00:00",
+      "durationMs": 1692
+    },
+    "clock.p2.task.7": {
+      "file": "audio/clock/p2.task.7.mp3",
+      "textSha256": "235b25fdd89dfd1db00476eee5b8a424373c4b9a511c81d9a24ff47e4c306365",
+      "hash": "3f24c787e016eef6",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:46+00:00",
+      "durationMs": 4448
+    },
+    "clock.p2.task.12": {
+      "file": "audio/clock/p2.task.12.mp3",
+      "textSha256": "6193297f355dc92f2e1e6cc15def080e1806014a8db5823f3bda638c473c9024",
+      "hash": "96b79bc310222293",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:47+00:00",
+      "durationMs": 4669
+    },
+    "clock.p2.hint": {
+      "file": "audio/clock/p2.hint.mp3",
+      "textSha256": "5590d76baae6cd29b8eee516900f9b6a1c4d3913812392aa693a5bcec64999c5",
+      "hash": "93295696757dbd76",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:47+00:00",
+      "durationMs": 3061
+    },
+    "clock.p2.done": {
+      "file": "audio/clock/p2.done.mp3",
+      "textSha256": "03561b60e2cdd0e6bf9ff70c67346e3763a7d91e2ce21eb4c9eb96288de82a31",
+      "hash": "7b258153a90de4f0",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:48+00:00",
+      "durationMs": 1261
+    },
+    "clock.p3.intro": {
+      "file": "audio/clock/p3.intro.mp3",
+      "textSha256": "6978c0aa1a5c0f10735fb87bca8ebab1eb66a26bdcd5a9395d188fbcf07e1aa2",
+      "hash": "43419b359d2e2ec3",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:48+00:00",
+      "durationMs": 2599
+    },
+    "clock.p3.ask.8": {
+      "file": "audio/clock/p3.ask.8.mp3",
+      "textSha256": "946c8baf57290cbf5b871a2efe82d16559076c9bfd45f6d8d8a1169d0c9c3d7b",
+      "hash": "80f5ebdab0dd9ead",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:49+00:00",
+      "durationMs": 3270
+    },
+    "clock.p3.ask.3": {
+      "file": "audio/clock/p3.ask.3.mp3",
+      "textSha256": "8c25003fac09aaa79179482c3416e73aaf8593bf4a2adcf92eb038d14cd4cd7e",
+      "hash": "15c525db1a978340",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:49+00:00",
+      "durationMs": 1749
+    },
+    "clock.p3.ask.9": {
+      "file": "audio/clock/p3.ask.9.mp3",
+      "textSha256": "3c0f89b09e45c4c8534599acd00281b4b6ce2503ec7f4afe381899bb650de813",
+      "hash": "cb36f6d5d9be074b",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:50+00:00",
+      "durationMs": 3653
+    },
+    "clock.p3.wrong": {
+      "file": "audio/clock/p3.wrong.mp3",
+      "textSha256": "58c0a1d1025f2ada1bdf3388e01982ec598bd725e99e44d510ae4619456dd581",
+      "hash": "2efb840b6a3b77b3",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:50+00:00",
+      "durationMs": 2538
+    },
+    "clock.p3.right": {
+      "file": "audio/clock/p3.right.mp3",
+      "textSha256": "97c6bbf85445aaa6eb2087f5b4e3132de89a79c6a7b79c623adafb714e1d48f6",
+      "hash": "3320faa3df96d42f",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:51+00:00",
+      "durationMs": 613
+    },
+    "clock.p4.intro": {
+      "file": "audio/clock/p4.intro.mp3",
+      "textSha256": "b792af3a040c0471c6279a88045474fcc67afb01c1b3df8c715d62fd92e4a6a7",
+      "hash": "443a8925d38f6a47",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:51+00:00",
+      "durationMs": 5679
+    },
+    "clock.p4.demo": {
+      "file": "audio/clock/p4.demo.mp3",
+      "textSha256": "7383f5b6f9455252dfcb6d8e6fdd4fe2f13a104d01e76b309c144b807f0f727b",
+      "hash": "4b2b09184f495d36",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:52+00:00",
+      "durationMs": 7402
+    },
+    "clock.p4.task.3": {
+      "file": "audio/clock/p4.task.3.mp3",
+      "textSha256": "94a3d1f64c40084024aa99104908e26f2d635e119486939ccd0fe898132089d4",
+      "hash": "eebdf19c18744902",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:53+00:00",
+      "durationMs": 2455
+    },
+    "clock.p4.task.7": {
+      "file": "audio/clock/p4.task.7.mp3",
+      "textSha256": "9a2f88dd9f5f2d5f8f90a3804c2ce042e0318068741daaeb461e4a39e71ebbdc",
+      "hash": "d76ee05f444277da",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:53+00:00",
+      "durationMs": 1609
+    },
+    "clock.p4.hint": {
+      "file": "audio/clock/p4.hint.mp3",
+      "textSha256": "ee648828dd28982cf5cfc963426d52392a77b753db16db4289203843a2a9a8e2",
+      "hash": "6de8184ae97c6cf6",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:54+00:00",
+      "durationMs": 2364
+    },
+    "clock.p4.done": {
+      "file": "audio/clock/p4.done.mp3",
+      "textSha256": "abb7e4a8a3a2ddf5a77baf2d071a4caa4b03a343ac44869174108a8b00b1685a",
+      "hash": "63eb4be527310605",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:54+00:00",
+      "durationMs": 2039
+    },
+    "clock.p5.intro": {
+      "file": "audio/clock/p5.intro.mp3",
+      "textSha256": "cd4f6cd5d693fb9890a63e2af5edc3d6485334ad11a2d528a837926441260979",
+      "hash": "17d5faeb6d3e79f8",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:55+00:00",
+      "durationMs": 4724
+    },
+    "clock.p5.wake": {
+      "file": "audio/clock/p5.wake.mp3",
+      "textSha256": "d6e81486e423bfd919e112c7a5182b83312532ebfac740f3905f1e22cd0db0d2",
+      "hash": "18cc95f7d0d3c06b",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:55+00:00",
+      "durationMs": 2075
+    },
+    "clock.p5.school": {
+      "file": "audio/clock/p5.school.mp3",
+      "textSha256": "95f3b64bbc874c8f78e99d6fd30652a1513ec25ca5f6789d03371492193629ac",
+      "hash": "6d360f9ca47482ba",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:56+00:00",
+      "durationMs": 2164
+    },
+    "clock.p5.lunch": {
+      "file": "audio/clock/p5.lunch.mp3",
+      "textSha256": "506ceeb53f9d44a54645784716676716622a57ea05ded42308cbbdf2467f8fc7",
+      "hash": "4e44e69fa2481888",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:56+00:00",
+      "durationMs": 1842
+    },
+    "clock.p5.snack": {
+      "file": "audio/clock/p5.snack.mp3",
+      "textSha256": "01bc888a36e5e70f967ea5ac25f8726b4f884252ceec5b59a0e27deb1e824612",
+      "hash": "e49aa3c62f2465c0",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:57+00:00",
+      "durationMs": 2491
+    },
+    "clock.p5.sleep": {
+      "file": "audio/clock/p5.sleep.mp3",
+      "textSha256": "99510895172eae6e48aaf1412c4b9c8bd9b56c702a03cd128ce32143ffc94485",
+      "hash": "39077129b594152b",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:58+00:00",
+      "durationMs": 3920
+    },
+    "clock.p5.wrong": {
+      "file": "audio/clock/p5.wrong.mp3",
+      "textSha256": "b675a8f22f1ad8203cdbe067f88b01429e1b5666e1247db3ee51638a8f13f9c9",
+      "hash": "4e0e4f3d297f45e2",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:58+00:00",
+      "durationMs": 2384
+    },
+    "clock.p5.done": {
+      "file": "audio/clock/p5.done.mp3",
+      "textSha256": "194ed140b92085f7138c1e7fbd00aa6ec4fe9cedb729575aad6578ac1d8faee8",
+      "hash": "8d8febe6873c0473",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:59+00:00",
+      "durationMs": 2422
+    },
+    "clock.p6.bridge": {
+      "file": "audio/clock/p6.bridge.mp3",
+      "textSha256": "667d59ac28222c4a47d390c3376841c8f06a908ccdde264b63188aaa0aefa5ef",
+      "hash": "10e5fca3661a8bba",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:47:59+00:00",
+      "durationMs": 5720
+    },
+    "clock.p6.bridge2": {
+      "file": "audio/clock/p6.bridge2.mp3",
+      "textSha256": "e8261ddf7e5ad79130c82495b80ab0ac0d696263ff9e02ab3c090aa47d12edc0",
+      "hash": "8e67cc66358900bc",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:48:00+00:00",
+      "durationMs": 3838
+    },
+    "clock.p7.reward": {
+      "file": "audio/clock/p7.reward.mp3",
+      "textSha256": "32cafcd06c159dba91947fbae5c963ab534e545aed90a4a3660a6ea7109f2c18",
+      "hash": "eedf60a9f79a84fd",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:48:00+00:00",
+      "durationMs": 4080
+    },
+    "clock.star": {
+      "file": "audio/clock/star.mp3",
+      "textSha256": "e394d603620963fc78cb6fe73e2c191d14d123af1674d64543545929b966f07b",
+      "hash": "390556aa2b4275c0",
+      "backend": "say",
+      "voice": "Meijia",
+      "params": {
+        "rate": 175
+      },
+      "generatedAt": "2026-09-12T05:48:01+00:00",
+      "durationMs": 1414
+    }
+  }
+}
