@@ -87,3 +87,9 @@ Azure REST 的端點與標頭沿 `profit/lib/tts_azure.py`（唯讀借鏡）。
 自己每幀比對播放位置，前景時也不受計時器夾限。AudioContext 沒解鎖（沒有使用者手勢）時 play() 直接 reject，
 旁白退回字數估時＋字幕，不會卡住——自動化測試與真實裝置的自動播放被擋都走這條。
 貓嘴：AnalyserNode 掛在 Howler.masterGain 讀 RMS，有音檔時嘴巴跟音量、沒音檔時用估時擺動。
+
+### D24 PWA 與部署：自製 service worker、直向不強制轉向、圖示由 Blender 渲染貓（2026-09-12）
+service worker 由 `tools/build-sw.mjs` 掃 dist/ 產清單（cache-first、換版清舊快取），不用 vite-plugin-pwa——要的只是清單＋快取，
+不值得拉進 workbox 整套。直向不顯示「請轉成橫向」：控制區會自己搬到書的上或下方，能玩就不要擋。
+圖示：`tools/blender/icon.py` 在同一個 Blender session 跑 cat.py 建模再渲染（透明底、PIL 合成暖色），
+`tools/icon-derive.py` 出 192／512／maskable／apple-touch；1 MB 母圖不進 repo。眼睛因此往前移（原本幾乎埋在頭裡）。

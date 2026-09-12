@@ -99,8 +99,9 @@ for i, (x, s) in enumerate([(-0.07, 0.8), (0.0, 1.0), (0.07, 0.8)]):
 for side, name in [(-1, "L"), (1, "R")]:
     cone(f"Ear{name}", 0.085, 0.16, (0.15 * side, 0.02, 0.69), (math.radians(-12), math.radians(22 * side), 0), FUR, parent=head)
     cone(f"EarInner{name}", 0.045, 0.09, (0.145 * side, 0.045, 0.68), (math.radians(-12), math.radians(22 * side), 0), PINK, parent=head)
-    eye = sphere(f"Eye{name}", 0.05, (0.085 * side, 0.225, 0.515), scale=(1.0, 0.55, 1.15), mat=INK, seg=20, rings=12, parent=head)
-    sphere(f"Shine{name}", 0.017, (0.085 * side + 0.017 * side, 0.255, 0.535), mat=CREAM, seg=12, rings=8, parent=eye)
+    # 眼睛要明顯突出頭的球面（頭在這個位置的表面約 y=0.27），不然只剩一線黑（2026-09-12 圖示渲染抓到）
+    eye = sphere(f"Eye{name}", 0.05, (0.085 * side, 0.262, 0.515), scale=(1.0, 0.6, 1.15), mat=INK, seg=20, rings=12, parent=head)
+    sphere(f"Shine{name}", 0.016, (0.085 * side + 0.016 * side, 0.29, 0.536), mat=CREAM, seg=12, rings=8, parent=eye)
     sphere(f"Blush{name}", 0.05, (0.15 * side, 0.20, 0.45), scale=(1.0, 0.35, 0.6), mat=BLUSH, seg=14, rings=8, parent=head)
 sphere("Nose", 0.02, (0, 0.292, 0.47), scale=(1.3, 0.8, 0.8), mat=PINK, seg=12, rings=8, parent=head)
 sphere("Mouth", 0.024, (0, 0.285, 0.43), scale=(1.5, 0.6, 0.35), mat=INK, seg=12, rings=8, parent=head)

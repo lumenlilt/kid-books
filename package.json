@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && node tools/build-sw.mjs",
     "preview": "vite preview --host",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

@@ -1,0 +1,17 @@
+{
+  "name": "魔法書房",
+  "short_name": "魔法書房",
+  "description": "3D 書架上的立體書，帶小朋友認識時鐘。",
+  "lang": "zh-Hant-TW",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#2b2340",
+  "theme_color": "#2b2340",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

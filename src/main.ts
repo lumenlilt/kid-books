@@ -282,6 +282,13 @@ if (params.get('turbo') === '1') {
   }, 100);
 }
 
+// PWA：正式建置才註冊 service worker（tools/build-sw.mjs 產的 /sw.js），離線也能整本玩
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+  });
+}
+
 canvas.addEventListener('webglcontextlost', (event) => {
   event.preventDefault();
   window.location.reload();
