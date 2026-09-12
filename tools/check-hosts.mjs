@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 建置產物裡不准有第三方網址：這是兒童產品，零外連是硬規則（CSP 也只允許 'self'）。
-// JS 裡的字串網址只當「候選」報出來——three.js 的警告訊息會附文件連結，那不是連線；
+// JS 裡的字串網址只當「候選」報出來——three.js 的警告訊息會附文件連結、zod 內含 json-schema.org 的 $schema 識別字，那些不是連線；
 // 所以用主機名白名單：白名單以外的任何主機一律紅，由人判斷後再加進白名單。
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -11,7 +11,7 @@ if (!existsSync(distDir)) {
   console.error('✘ check:hosts：沒有 dist/，先 npm run build');
   process.exit(1);
 }
-const DOC_HOSTS = new Set(['threejs.org', 'github.com', 'developer.mozilla.org', 'www.w3.org', 'www.khronos.org', 'registry.khronos.org', 'creativecommons.org', 'kenney.nl', 'opensource.org', 'jcgt.org']);
+const DOC_HOSTS = new Set(['threejs.org', 'github.com', 'developer.mozilla.org', 'www.w3.org', 'www.khronos.org', 'registry.khronos.org', 'creativecommons.org', 'kenney.nl', 'opensource.org', 'jcgt.org', 'json-schema.org']);
 const URL_RE = /https?:\/\/([a-z0-9.-]+)[^\s"'`)<>]*/gi;
 const failures = [];
 const seen = new Map();

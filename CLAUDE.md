@@ -27,6 +27,7 @@ python3 tools/build-font.py                         # 字型子集（專案 venv
 - **旁白台詞改了就要重產音檔**：`check-audio` 比對 hash；`--release` 不接受 macOS `say` 產的佔位音檔。
 - **金鑰不進 repo**：Azure 金鑰只在 `.env`（gitignore）；正本在 `../profit/config/azure-speech.json`，用 shell 匯出，不複製檔案，也不改 profit 的任何檔案。
 - **每支檢查器做完都要故意弄壞一次**證明它會紅（L1 規則⑤）。
+- **commit 前的 verify 不准接管線**：`bash tools/verify.sh && git commit …`，不要 `verify | grep … && git commit`——管線的結束碼是最後一個指令的，2026-09-12 就這樣把紅燈推上去過一次。
 - 決定連理由記 `DECISIONS.md`（只加不改）；收工前更新 `STATUS.md` 上半。
 
 ## 持久記憶
