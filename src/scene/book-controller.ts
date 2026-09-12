@@ -2,6 +2,7 @@ import { PerspectiveCamera, Vector3, type Scene, type WebGLRenderer } from 'thre
 import { createActivity } from '../activities/registry';
 import type { Activity, ActivityContext } from '../activities/types';
 import { createBookFsm, type BookState } from '../app/book-fsm';
+import type { AudioBus } from '../app/audio';
 import type { Narrator } from '../app/narrator';
 import type { ProgressStore } from '../app/store';
 import type { BookDef } from '../content/schema';
@@ -37,6 +38,7 @@ export interface BookControllerDeps {
   hud: { setStars(n: number): void; starTarget: Element };
   uiRoot: HTMLElement;
   store: ProgressStore;
+  audio: AudioBus;
   /** 闔書回架之後：這本書是不是剛第一次讀完（獎勵登場用） */
   onCompleted?: (bookId: string, firstTime: boolean) => void;
 }
@@ -127,8 +129,10 @@ export function createBookController(d: BookControllerDeps): BookController {
     current = sb;
     bookDef = def;
     completedFirstTime = false;
-    d.narrator.setLines(def.lines);
+    d.narrator.setLines(def.lines, bookId);
     d.store.bookOpened(bookId);
+    d.audio.preload(bookId, Object.keys(def.lines));
+    d.audio.sfx('whoosh');
     d.input.setEnabled(false);
     const mesh = sb.mesh;
 
@@ -177,6 +181,7 @@ export function createBookController(d: BookControllerDeps): BookController {
     fsm.send('ARRIVED');
 
     // 3. 翻開，紙雕隨角度立起
+    d.audio.sfx('open');
     await tween({
       duration: 950,
       ease: easeInOutCubic,
@@ -234,6 +239,7 @@ export function createBookController(d: BookControllerDeps): BookController {
       mirror,
       totalStars: () => d.store.bookStars(book.id),
       recordAttempt: () => d.store.recordAttempt(book.id, page.id),
+      sfx: (name) => d.audio.sfx(name),
       mountClock(opts = {}) {
         const clock = createClockSvg();
         const box = document.createElement('div');
@@ -271,13 +277,17 @@ export function createBookController(d: BookControllerDeps): BookController {
     if (signal.aborted || !bookDef) return;
     if (page.countsForCompletion) {
       const first = d.store.recordPage(bookDef.id, page.id);
+      d.audio.sfx('star');
       const from = d.overlay.deck.firstElementChild ?? d.overlay.deck;
       if (first) void burstStars(from, d.hud.starTarget, d.uiRoot).then(() => d.hud.setStars(d.store.totalStars()));
       else void burstStars(from, d.hud.starTarget, d.uiRoot, 4);
     }
     if (page.doneSay) await d.narrator.say(page.doneSay);
     if (signal.aborted) return;
-    if (i + 1 < bookDef.pages.length) d.overlay.showNext(() => void startPage(i + 1));
+    if (i + 1 < bookDef.pages.length) d.overlay.showNext(() => {
+      d.audio.sfx('select');
+      void startPage(i + 1);
+    });
   }
 
   async function close(): Promise<void> {
@@ -291,6 +301,7 @@ export function createBookController(d: BookControllerDeps): BookController {
     d.overlay.deck.replaceChildren();
     d.overlay.hide();
     d.onReading?.(false);
+    d.audio.sfx('close');
     void d.cat.jumpHome();
     await tween({
       duration: 800,
@@ -331,7 +342,10 @@ export function createBookController(d: BookControllerDeps): BookController {
     stage = null;
     book = null;
     const finishedId = current.entry.id;
-    if (bookDef) current.setDone(d.store.isBookComplete(bookDef.id, countingIds(bookDef)));
+    if (bookDef) {
+      current.setDone(d.store.isBookComplete(bookDef.id, countingIds(bookDef)));
+      d.audio.unloadBook(bookDef.id);
+    }
     current = null;
     d.input.setEnabled(true);
     d.onCompleted?.(finishedId, completedFirstTime);

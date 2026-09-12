@@ -63,7 +63,10 @@ export function createClockSet(def: Def): Activity {
             const off = cl.onRelease((total) => {
               if (sameOnFace(fromTotal(total), task.target)) {
                 off();
+                ctx?.sfx('correct');
                 resolve();
+              } else {
+                ctx?.sfx('tap');
               }
             });
             signal.addEventListener('abort', () => off(), { once: true });

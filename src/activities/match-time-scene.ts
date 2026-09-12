@@ -52,11 +52,13 @@ export function createMatchTimeScene(def: Def): Activity {
               if (!btn || btn.classList.contains('is-done')) return;
               if (id === pair.card) {
                 pick = null;
+                ctx?.sfx('correct');
                 btn.className = 'card is-correct';
                 resolve();
               } else {
                 wrong += 1;
                 ctx?.recordAttempt();
+                ctx?.sfx('wrong');
                 btn.className = 'card is-wrong';
                 void narrator.say(def.wrongSay);
                 if (wrong >= def.maxWrongBeforeShow) {

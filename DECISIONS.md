@@ -81,3 +81,9 @@ DOM 矩形是書八個角投影一次的包圍盒。`snapTo` 必須立刻套用�
 書本一有 `lines`，`check-audio` 就會紅——這是設計。與其在 M3 期間放著紅燈，先把管線做出來用 `say` 產佔位音檔；
 `--release` 仍會擋 say 產的音檔上線。播放端（Howler、iOS 解鎖、打斷）留在 M5；M3 的旁白用字數估時長＋字幕＋貓嘴動。
 Azure REST 的端點與標頭沿 `profit/lib/tts_azure.py`（唯讀借鏡）。
+
+### D23 旁白播完由每幀的 seek≥duration 判斷，不靠 Howler 的 setTimeout（2026-09-12）
+背景分頁的計時器會被 Chrome 節流（超過五分鐘變每分鐘一次），Howler 的 'end' 事件靠 setTimeout，會晚很久才來；
+自己每幀比對播放位置，前景時也不受計時器夾限。AudioContext 沒解鎖（沒有使用者手勢）時 play() 直接 reject，
+旁白退回字數估時＋字幕，不會卡住——自動化測試與真實裝置的自動播放被擋都走這條。
+貓嘴：AnalyserNode 掛在 Howler.masterGain 讀 RMS，有音檔時嘴巴跟音量、沒音檔時用估時擺動。

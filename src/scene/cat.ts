@@ -12,8 +12,10 @@ export interface Cat {
   update(dt: number): void;
   /** 被摸：跳一下 */
   poke(): Promise<unknown>;
-  /** 講話中：嘴巴開合 */
+  /** 講話中：嘴巴開合（估時模式） */
   setTalking(on: boolean): void;
+  /** 有音檔時：嘴巴開度 0..1 跟著音量 */
+  setMouth(level: number): void;
   /** 記住現在的位置與朝向當「家」（書架頂） */
   setHome(): void;
   /** 拋物線跳到世界座標某點並轉向 */
@@ -52,6 +54,7 @@ export async function createCat(accent: number): Promise<Cat> {
   let blinkAt = 2.5;
   let blinkPhase = -1;
   let talking = false;
+  let mouthLevel = 0;
   const basePos = new Vector3();
   const home = new Vector3();
   let homeRotY = 0;
@@ -83,7 +86,7 @@ export async function createCat(accent: number): Promise<Cat> {
           for (const e of eyes) e.scale.y = eyeScaleY;
         }
       }
-      if (mouth) mouth.scale.y = mouthScaleY * (talking ? 1 + Math.abs(Math.sin(t * 14)) * 3.5 : 1);
+      if (mouth) mouth.scale.y = mouthScaleY * (mouthLevel > 0.02 ? 1 + mouthLevel * 4 : talking ? 1 + Math.abs(Math.sin(t * 14)) * 3.5 : 1);
     },
     poke() {
       basePos.copy(g.position);
@@ -102,6 +105,9 @@ export async function createCat(accent: number): Promise<Cat> {
     },
     setTalking(on) {
       talking = on;
+    },
+    setMouth(level) {
+      mouthLevel = level;
     },
     setHome() {
       home.copy(g.position);

@@ -1,3 +1,4 @@
+import type { SfxName } from '../app/audio';
 import type { Narrator } from '../app/narrator';
 import type { BookDef, PageDef } from '../content/schema';
 import type { ClockStage } from '../scene/popup/clock-stage';
@@ -26,6 +27,7 @@ export interface ActivityContext {
   totalStars(): number;
   /** 答錯／要示範：記進家長報告的重試次數 */
   recordAttempt(): void;
+  sfx(name: SfxName): void;
   signal: AbortSignal;
 }
 

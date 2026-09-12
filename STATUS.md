@@ -23,13 +23,14 @@
 - **M4 獎勵與人物完成**（2026-09-12）：`app/store.ts`（localStorage 一把 key、版本化遷移、最多四位、注入式 storage＋測試）、
   選角畫面（四個紙偶 SVG）、HUD 頭像（短按換人、長按家長報告）、讀完書→鏡頭帶去看牆上登場的咕咕鐘（鐘擺、真實時間、鳥探頭）、
   書脊金書籤、本機家長報告（每頁星／重試／讀完日期）。重新載入後進度與裝飾都從 store 推導。
+- **M5 播放端完成**（2026-09-12）：`app/audio.ts`（Howler：旁白一次一句可打斷、SFX 12 個 Kenney、靜音、首次手勢解鎖、
+  每幀 seek 判播完、沒解鎖就退回估時）、貓嘴隨音量、SFX 接到每個互動點。音檔仍是 say 佔位（等 Azure 金鑰）。
 
 ## 下一步
 
 1. **等使用者**：Azure 金鑰失效（401），使用者去入口網站重產／確認區域 → 我產四段聲線樣本讓他選 → 全量重產。
-2. M5 播放端：Howler、iOS 首次觸碰解鎖（選角那一下）、旁白打斷、貓嘴隨音量、SFX 接上（Kenney）。
-3. M6 PWA＋部署：manifest、圖示、service worker、`wrangler deploy`、`check-site.sh`、README。
-4. 使用者在 Browser pane 打開 `http://localhost:64169/?hour=10` 實際玩一遍時鐘書，回報手感與台詞。
+2. M6 PWA＋部署：manifest、圖示（Blender 渲染貓）、service worker（掃 dist 產清單）、`wrangler deploy`、`check-site.sh`、README。
+3. 使用者在 Browser pane 打開 `http://localhost:64169/?hour=10` 實際玩一遍時鐘書（有聲音），回報手感與台詞。
 
 ## 等使用者裁示
 

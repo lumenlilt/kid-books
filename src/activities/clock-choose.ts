@@ -67,6 +67,7 @@ export function createClockChoose(def: Def): Activity {
               if (!card) return;
               if (pos === answerPos) {
                 pick = null;
+                ctx?.sfx('correct');
                 card.className = 'card is-correct';
                 const opt = round.options[round.answer];
                 if (opt) ctx?.mirror(toTotal(opt));
@@ -74,6 +75,7 @@ export function createClockChoose(def: Def): Activity {
               } else {
                 wrong += 1;
                 ctx?.recordAttempt();
+                ctx?.sfx('wrong');
                 card.className = 'card is-wrong';
                 void narrator.say(def.wrongSay);
                 if (wrong >= def.maxWrongBeforeShow) {

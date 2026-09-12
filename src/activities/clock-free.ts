@@ -15,6 +15,7 @@ export function createClockFree(def: Def): Activity {
       const clock = c.mountClock();
       clock.setMode({ hands: 'both', draggable: ['hour', 'minute'], snap: null });
       clock.setTotal(toTotal(def.startTime));
+      clock.onRelease(() => ctx?.sfx('tap'));
       clock.onInteract(() => {
         count += 1;
         if (!done && count >= def.interactionsToStar) {

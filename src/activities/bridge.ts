@@ -29,6 +29,7 @@ export function createBridge(_def: Def): Activity {
       btn.innerHTML = `${checkSvg}<span>${ui.book.done}</span>`;
       btn.addEventListener('click', () => {
         btn.disabled = true;
+        ctx?.sfx('correct');
         ctx?.complete();
       });
       stack.append(btn);
