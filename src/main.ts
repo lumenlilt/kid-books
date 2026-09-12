@@ -175,6 +175,7 @@ layout.onLayout(() => books.relayout());
 // 時間 → 天色與燈光
 room.window.setHour(hour);
 lights.setNight(nightAmountAt(hour));
+room.setNight(nightAmountAt(hour));
 let lampOn = nightAmountAt(hour) > 0.3;
 lights.setLamp(lampOn);
 

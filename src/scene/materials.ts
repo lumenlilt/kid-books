@@ -1,4 +1,4 @@
-import { CanvasTexture, MeshStandardMaterial, RepeatWrapping, type Texture } from 'three';
+import { CanvasTexture, MeshStandardMaterial, RepeatWrapping, type Material, type Texture } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 let grain: Texture | null = null;
@@ -46,6 +46,43 @@ export function paperGrain(): Texture {
 }
 
 /**
+ * 玩具著色：注入兩個效果——世界空間「上亮下暗」的漸層（像柔光箱從上面打）與菲涅耳邊光（邊緣微亮，像塑膠／絨毛的柔和輪廓）。
+ * 用 onBeforeCompile 加在 MeshStandardMaterial 上，所有 toy 材質共用同一支 program（customProgramCacheKey）。
+ */
+export function toyShading(material: MeshStandardMaterial, opts: { gradient?: number; rim?: number } = {}): MeshStandardMaterial {
+  const gradient = opts.gradient ?? 0.16;
+  const rim = opts.rim ?? 0.1;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms['uToyGradient'] = { value: gradient };
+    shader.uniforms['uToyRim'] = { value: rim };
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vToyWorldNormal;')
+      .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nvToyWorldNormal = normalize(mat3(modelMatrix) * objectNormal);');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vToyWorldNormal;\nuniform float uToyGradient;\nuniform float uToyRim;')
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        {
+          float up = clamp(vToyWorldNormal.y * 0.5 + 0.5, 0.0, 1.0);
+          diffuseColor.rgb *= mix(1.0 - uToyGradient, 1.0 + uToyGradient * 0.45, up);
+          vec3 viewDir = normalize(vViewPosition);
+          float facing = clamp(dot(normalize(vNormal), viewDir), 0.0, 1.0);
+          float rimK = pow(1.0 - facing, 3.0);
+          diffuseColor.rgb += rimK * uToyRim;
+        }`,
+      );
+  };
+  material.customProgramCacheKey = () => `toy:${gradient}:${rim}`;
+  return material;
+}
+
+/** 對載入的模型（GLB）也套玩具著色 */
+export function applyToyShading(material: Material): void {
+  if (material instanceof MeshStandardMaterial) toyShading(material);
+}
+
+/**
  * 材質工廠（名字留著 paper 是歷史：D07 時是紙雕，2026-09-12 使用者裁示改**柔軟玩具風**）：
  * 平滑著色、霧面塑膠（粗糙度 0.6）、吃環境反射；紙紋只在 grain: true 時加。所有自製幾何都走這裡，換色板才換得動。
  */
@@ -55,7 +92,7 @@ export function paper(color: number, opts: { roughness?: number; flat?: boolean;
     m.bumpMap = paperGrain();
     m.bumpScale = 0.0035;
   }
-  return m;
+  return toyShading(m);
 }
 
 /** 圓角盒：玩具風的基本磚。半徑預設取最短邊的 1/6，不超過 0.05。 */

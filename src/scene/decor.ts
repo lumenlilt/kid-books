@@ -1,15 +1,18 @@
 // 房間擺設（程序生成、跟色板走）：彩旗、窗簾、雲朵吊飾、彩虹海報、圓地毯貼圖、木地板貼圖。
 // 全部是紙藝：平色、有厚度、柔影。任何一件都能單獨拿掉。
 import {
-  CanvasTexture, CatmullRomCurve3, CircleGeometry, Color, CylinderGeometry, DoubleSide, ExtrudeGeometry, Group, Mesh,
-  MeshStandardMaterial, PlaneGeometry, RepeatWrapping, Shape, ShapeGeometry, SRGBColorSpace, TubeGeometry, Vector3,
+  AdditiveBlending, BufferGeometry, CanvasTexture, CatmullRomCurve3, CircleGeometry, Color, CylinderGeometry, DoubleSide, ExtrudeGeometry, Float32BufferAttribute,
+  Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, RepeatWrapping, Shape, ShapeGeometry, SphereGeometry, SRGBColorSpace,
+  TorusGeometry, TubeGeometry, Vector3,
 } from 'three';
-import { paper } from './materials';
+import { paper, roundedBox } from './materials';
 import { hex, type Palette } from './palette';
 
 export interface Decor {
   group: Group;
   update(dt: number): void;
+  /** 0 白天…1 深夜：光柱與浮塵只在白天 */
+  setNight(amount: number): void;
 }
 
 const canvasTexture = (size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void): CanvasTexture => {
@@ -236,12 +239,84 @@ export function createDecor(palette: Palette): Decor {
   rail.position.set(0, 0.96, -2.47);
   g.add(rail);
 
+  // 窗光光柱：三片加法混合的半透明四邊形，從窗戶斜灑到地上
+  const rays = new Group();
+  const rayMat = new MeshBasicMaterial({ color: 0xfff1c0, transparent: true, opacity: 0.06, blending: AdditiveBlending, depthWrite: false, side: DoubleSide });
+  for (let i = 0; i < 3; i += 1) {
+    const geo = new PlaneGeometry(0.32, 3.4);
+    const m = new Mesh(geo, rayMat);
+    m.position.set(1.45 + i * 0.28, 1.05, -0.95);
+    m.rotation.set(-0.62, 0.05, 0.12 - i * 0.04);
+    rays.add(m);
+  }
+  g.add(rays);
+
+  // 浮塵：光柱裡慢慢飄的小點
+  const dustGeo = new BufferGeometry();
+  const N = 90;
+  const dustPos = new Float32Array(N * 3);
+  const dustSeed = new Float32Array(N);
+  for (let i = 0; i < N; i += 1) {
+    dustPos[i * 3] = 1.2 + Math.random() * 1.0;
+    dustPos[i * 3 + 1] = 0.2 + Math.random() * 1.8;
+    dustPos[i * 3 + 2] = -2.0 + Math.random() * 2.2;
+    dustSeed[i] = Math.random() * Math.PI * 2;
+  }
+  dustGeo.setAttribute('position', new Float32BufferAttribute(dustPos, 3));
+  const dustTex = canvasTexture(32, (ctx, s) => {
+    const grd = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    grd.addColorStop(0, 'rgba(255,255,255,1)');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, s, s);
+  });
+  const dust = new Points(dustGeo, new PointsMaterial({ map: dustTex, size: 0.035, transparent: true, opacity: 0.55, depthWrite: false, blending: AdditiveBlending, color: 0xfff4d6 }));
+  g.add(dust);
+  updaters.push((_dt, tt) => {
+    const arr = dustGeo.attributes['position'];
+    if (!arr) return;
+    for (let i = 0; i < N; i += 1) {
+      const s0 = dustSeed[i] ?? 0;
+      arr.setY(i, (arr.getY(i) + 0.02 * _dt * Math.sin(tt * 0.5 + s0) + 0.006 * _dt) % 2.2);
+      arr.setX(i, arr.getX(i) + Math.sin(tt * 0.7 + s0) * 0.0006);
+    }
+    arr.needsUpdate = true;
+  });
+
+  // 積木與球：地上的玩具
+  const blocks = new Group();
+  const blockCols = [palette.accent, palette.sky, 0xffd45a];
+  blockCols.forEach((c, i) => {
+    const b = new Mesh(roundedBox(0.16, 0.16, 0.16, 0.03), paper(c));
+    b.position.set(i === 2 ? 0.08 : i * 0.17 - 0.02, i === 2 ? 0.24 : 0.08, i === 1 ? 0.04 : 0);
+    b.rotation.y = i * 0.5;
+    b.castShadow = true;
+    b.receiveShadow = true;
+    blocks.add(b);
+  });
+  blocks.position.set(-1.55, 0, -0.55);
+  g.add(blocks);
+  const ball = new Group();
+  const ballMesh = new Mesh(new SphereGeometry(0.13, 24, 18), paper(palette.paper));
+  ballMesh.castShadow = true;
+  ballMesh.receiveShadow = true;
+  const stripe = new Mesh(new TorusGeometry(0.128, 0.03, 10, 32), paper(palette.accent));
+  stripe.rotation.x = 0.3;
+  ball.add(ballMesh, stripe);
+  ball.position.set(2.0, 0.13, -0.3);
+  g.add(ball);
+
   let t = 0;
   return {
     group: g,
     update(dt) {
       t += dt;
       for (const u of updaters) u(dt, t);
+    },
+    setNight(amount) {
+      rays.visible = amount < 0.5;
+      dust.visible = amount < 0.5;
+      rayMat.opacity = 0.06 * (1 - amount);
     },
   };
 }

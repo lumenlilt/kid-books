@@ -1,6 +1,7 @@
 import { Group, Mesh, MeshStandardMaterial, Vector3, type Object3D } from 'three';
 import { easeInOutSine, easeOutBack, lerp, tween } from '../lib/tween';
 import { loadModel } from './assets';
+import { applyToyShading } from './materials';
 import { fitHeight } from './room';
 
 /**
@@ -29,6 +30,9 @@ export async function createCat(accent: number): Promise<Cat> {
   const g = new Group();
   const model = await loadModel('/assets/models/cat.glb');
   fitHeight(model, CAT_HEIGHT);
+  model.traverse((o) => {
+    if (o instanceof Mesh && !Array.isArray(o.material)) applyToyShading(o.material);
+  });
   g.add(model);
 
   const part = (name: string): Object3D | null => model.getObjectByName(name) ?? null;

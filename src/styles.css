@@ -26,8 +26,8 @@ body {
 .hud-right { display: flex; gap: 12px; align-items: center; }
 .hud-btn, .hud-pill {
   min-width: 64px; min-height: 64px; border-radius: 999px; border: 0;
-  background: var(--paper, #fff6e5); color: var(--ink, #3a2e2a);
-  box-shadow: 0 6px 0 rgba(0,0,0,.12), 0 10px 24px rgba(0,0,0,.18);
+  background: linear-gradient(180deg, #ffffff 0%, var(--paper, #fff6e5) 100%); color: var(--ink, #3a2e2a);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.9), inset 0 -3px 0 rgba(0,0,0,.06), 0 6px 0 rgba(0,0,0,.12), 0 10px 24px rgba(0,0,0,.18);
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   font: 700 26px/1 "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif;
   padding: 0 18px; cursor: pointer; touch-action: manipulation;
@@ -69,7 +69,7 @@ body {
   box-shadow: 0 6px 0 rgba(0,0,0,.12), 0 10px 24px rgba(0,0,0,.18); pointer-events: none;
 }
 .subtitle[hidden] { display: none; }
-.next-btn { position: absolute; right: 18px; bottom: 18px; pointer-events: auto; background: var(--accent, #ff9f5a); color: #fff; min-width: 84px; min-height: 84px;
+.next-btn { position: absolute; right: 18px; bottom: 18px; pointer-events: auto; background: linear-gradient(180deg, #ffb27f, var(--accent, #ff9f5a)); color: #fff; min-width: 84px; min-height: 84px;
   animation: next-pop .4s cubic-bezier(.34,1.56,.64,1) both; }
 .next-btn[hidden] { display: none; }
 @keyframes next-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -110,7 +110,7 @@ body {
 .card.is-done { opacity: .35; pointer-events: none; }
 @keyframes card-pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 @keyframes card-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-.big-btn { background: var(--accent, #ff9f5a); color: #fff; min-width: 120px; min-height: 84px; font-size: 26px; gap: 12px; }
+.big-btn { background: linear-gradient(180deg, #ffb27f, var(--accent, #ff9f5a)); color: #fff; min-width: 120px; min-height: 84px; font-size: 26px; gap: 12px; }
 .ceremony { text-align: center; color: var(--ink, #3a2e2a); font: 700 28px/1.3 "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .ceremony .badge { font-size: 96px; line-height: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.25)); animation: card-pop .8s cubic-bezier(.34,1.56,.64,1); }
 .ceremony .stars { font-size: 34px; }

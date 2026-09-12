@@ -1,4 +1,4 @@
-import { CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, type BufferGeometry, type Material } from 'three';
+import { CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, SphereGeometry, type BufferGeometry, type Material } from 'three';
 import { segment } from '../../lib/fit-rect';
 import { paper, roundedBox } from '../materials';
 import { skyColorAt } from '../window';
@@ -71,7 +71,23 @@ export function createClockStage(): ClockStage {
   // 天空卡（後層）：圓角紙卡＋兩層山丘＋雲
   const back = new Group();
   back.position.set(0, 0.42, 0.006);
-  const skyMat = mat(new MeshBasicMaterial({ color: 0x9fd3ff }));
+  // 漸層天空：貼圖是「上淡下白」的亮度漸層，乘上依時間變化的天色
+  const skyTex = (() => {
+    const c = document.createElement('canvas');
+    c.width = 4;
+    c.height = 128;
+    const ctx = c.getContext('2d');
+    if (ctx) {
+      const grd = ctx.createLinearGradient(0, 0, 0, 128);
+      grd.addColorStop(0, '#ffffff');
+      grd.addColorStop(1, '#b9c8d6');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, 4, 128);
+    }
+    const t = new CanvasTexture(c);
+    return t;
+  })();
+  const skyMat = mat(new MeshBasicMaterial({ color: 0x9fd3ff, map: skyTex }));
   const skyShape = new Shape();
   const sw = 1.16;
   const sh = 0.72;
@@ -108,6 +124,19 @@ export function createClockStage(): ClockStage {
     cs.closePath();
     return geo(new ExtrudeGeometry(cs, { depth: 0.014, bevelEnabled: true, bevelSize: 0.008, bevelThickness: 0.005, bevelSegments: 3 }));
   };
+  // 樹：圓滾滾的兩層樹冠
+  const tree = (x: number, scale: number) => {
+    const trunk = mesh(geo(new CylinderGeometry(0.02 * scale, 0.025 * scale, 0.14 * scale, 10)), mat(paper(0x8a5a3c)));
+    trunk.position.set(x, 0.07 * scale, 0.03);
+    back.add(trunk);
+    const c1 = mesh(geo(new SphereGeometry(0.075 * scale, 16, 12)), mat(paper(0x6fbf73)));
+    c1.position.set(x, 0.17 * scale, 0.03);
+    const c2 = mesh(geo(new SphereGeometry(0.055 * scale, 16, 12)), mat(paper(0x8fd48f)));
+    c2.position.set(x + 0.03 * scale, 0.24 * scale, 0.035);
+    back.add(c1, c2);
+  };
+  tree(-0.47, 1.0);
+  tree(0.46, 0.85);
   const cloudMat = mat(paper(0xffffff, { flat: false }));
   const cloudA = mesh(cloudGeo(0.26), cloudMat);
   cloudA.position.set(-0.32, 0.5, 0.006);
@@ -136,8 +165,11 @@ export function createClockStage(): ClockStage {
   const towerDoor = mesh(geo(roundedBox(0.09, 0.14, 0.012)), mat(paper(0x8a5a3c, { flat: false })));
   towerDoor.position.set(0, 0.07, 0.034);
   mid.add(towerDoor);
+  const glowMat = mat(paper(0xfff1a8, { flat: false }));
+  glowMat.emissive.setHex(0xffd36a);
+  glowMat.emissiveIntensity = 0.15;
   for (const wx of [-0.08, 0.08]) {
-    const win = mesh(geo(roundedBox(0.05, 0.06, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+    const win = mesh(geo(roundedBox(0.05, 0.06, 0.01)), glowMat);
     win.position.set(wx, 0.2, 0.034);
     mid.add(win);
   }
@@ -192,9 +224,21 @@ export function createClockStage(): ClockStage {
   const door = mesh(geo(roundedBox(0.06, 0.1, 0.01)), mat(paper(0x8a5a3c, { flat: false })));
   door.position.set(0.04, 0.05, 0.034);
   front.add(door);
-  const houseWin = mesh(geo(roundedBox(0.05, 0.05, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+  const houseWin = mesh(geo(roundedBox(0.05, 0.05, 0.01)), glowMat);
   houseWin.position.set(-0.06, 0.11, 0.034);
   front.add(houseWin);
+  // 籬笆：右側幾根圓柱＋兩條橫桿
+  const fenceMat = mat(paper(0xfff6e5, { flat: false }));
+  for (let i = 0; i < 5; i += 1) {
+    const post = mesh(geo(roundedBox(0.03, 0.12, 0.03, 0.012)), fenceMat);
+    post.position.set(0.5 + i * 0.09, 0.06, 0);
+    front.add(post);
+  }
+  for (const ry of [0.04, 0.085]) {
+    const rail = mesh(geo(roundedBox(0.42, 0.02, 0.02, 0.008)), fenceMat);
+    rail.position.set(0.68, ry, 0);
+    front.add(rail);
+  }
   const chimney = mesh(geo(roundedBox(0.04, 0.09, 0.04)), mat(paper(0xb5654a)));
   chimney.position.set(-0.08, 0.27, 0);
   front.add(chimney);
@@ -227,6 +271,8 @@ export function createClockStage(): ClockStage {
     },
     setHour(hour) {
       skyMat.color.copy(skyColorAt(hour));
+      const night = hour < 6 || hour >= 18 ? 1 : 0;
+      glowMat.emissiveIntensity = 0.15 + night * 0.9;
       const day = (hour - 6) / 12;
       sun.visible = day >= 0 && day <= 1;
       if (sun.visible) sun.position.set(-0.45 + 0.9 * day, 0.18 + Math.sin(day * Math.PI) * 0.34, 0.004);

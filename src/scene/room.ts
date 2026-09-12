@@ -23,6 +23,7 @@ export interface Room {
   /** 把裝飾放進空位（剪影隱藏）；傳 null 清空回剪影 */
   setDecoration(slotId: string, object: Object3D | null): void;
   update(dt: number): void;
+  setNight(amount: number): void;
 }
 
 const _box = new Box3();
@@ -130,6 +131,9 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
     update(dt) {
       decor.update(dt);
       window.update(dt);
+    },
+    setNight(amount) {
+      decor.setNight(amount);
     },
     setDecoration(slotId, object) {
       const slot = slots.find((x) => x.id === slotId);

@@ -23,7 +23,7 @@ export interface CameraRig {
 
 export function createCameraRig(camera: PerspectiveCamera): CameraRig {
   const poses: Record<PoseName, Pose> = {
-    shelf: { position: new Vector3(0, 1.4, 3.0), target: new Vector3(0, 1.05, -1.2), fov: 36 },
+    shelf: { position: new Vector3(0, 1.3, 3.0), target: new Vector3(0, 1.08, -1.2), fov: 39 },
     reading: { position: new Vector3(0, 1.9, 2.4), target: new Vector3(0, 1.2, 0), fov: 36 },
     decoration: { position: new Vector3(-0.6, 1.9, 0.6), target: new Vector3(-1.75, 1.85, -2.4), fov: 30 },
   };
