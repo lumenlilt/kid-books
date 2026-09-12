@@ -6,3 +6,4 @@
 > 狀態型記憶（會靜默變假的）寫入時就標 `volatile: true` + `verify_by:`。
 
 - [Azure 金鑰住在 profit](azure-speech-key-lives-in-profit.md) — 旁白 TTS 用環境變數讀 profit/config 的金鑰，不複製進公開 repo
+- [Cloudflare zone 開關會漏第三方](cloudflare-zone-toggles-leak-third-party.md) — Web Analytics 注入與 NEL 只有 dashboard 關得掉；check-site 是探針

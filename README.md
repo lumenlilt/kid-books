@@ -3,8 +3,8 @@
 給幼稚園到國小低年級小朋友的 3D 書架：點一本書，書會翻開、紙雕場景從書頁立起來，
 旁白帶著小孩玩一個「幼小銜接」主題。每完成一頁得一顆星，讀完一本書，房間裡就多一件收藏。
 
-**狀態：建置中（M0 骨架）。** 第一本書是「認識時鐘：整點與半點」（108 課綱數學 N-1-6）。
-上線位置：<https://books.lumenlilt.app>（尚未部署）。
+**狀態：第一本書「認識時鐘：整點與半點」（108 課綱數學 N-1-6）可以整本玩了，旁白暫用 macOS 內建聲音。**
+上線位置：<https://books.lumenlilt.app>（iPad Safari 可「加入主畫面」離線玩）。
 
 A 3D pop-up bookshelf for kids aged 4–7, built for Taiwan's kindergarten-to-first-grade curriculum.
 Three.js stage + DOM controls, iPad-first, zero accounts, zero tracking.
@@ -20,8 +20,11 @@ Three.js stage + DOM controls, iPad-first, zero accounts, zero tracking.
 ```bash
 npm install
 npm run dev        # http://localhost:5173，--host 已開，iPad 在同一個 Wi-Fi 可以直接連
-npm run verify     # typecheck → vitest → build → 四支檢查（音檔、素材帳、字型字集、零外連）
+npm run verify     # typecheck → vitest → build（含 service worker）→ 四支檢查（音檔、素材帳、字型字集、零外連）
+npm run deploy     # verify → wrangler deploy → tools/check-site.sh books.lumenlilt.app
 ```
+
+除錯參數：`?debug=1`（fps／狀態面板、window.__kb）、`?hour=20`（假裝晚上）、`?palette=candy`、`?fast=1`（旁白加速）、`?turbo=1`（隱藏分頁也推進邏輯幀，自動化測試用）。
 
 旁白音檔由 `tools/tts.py` 產生（Azure Speech zh-TW；金鑰放 `.env`，不進版控），
 字型子集由 `tools/build-font.py` 產生。兩者的產出都進 repo，clone 下來就能跑。
