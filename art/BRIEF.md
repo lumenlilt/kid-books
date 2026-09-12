@@ -44,3 +44,23 @@ children's educational app illustration, Taiwanese kindergarten audience
 ## 之後（第二本書「數一數」）
 
 蘋果、籃子、數字積木、各 5–10 個可數的小物件（去背、單一物件）。等第一批對過風格再開。
+
+## 貓（吉祥物）概念圖 — 2026-09-13 新增
+
+程式建到 v3 仍不夠（使用者裁示），改成「你出概念圖、我照圖建模」。要的東西：
+
+| 檔名 | 內容 | 尺寸 |
+|---|---|---|
+| `cat-front.png` | 正面、站或坐、中性表情（微笑）、四肢與尾巴都看得到、純色或透明背景 | 1024×1024 |
+| `cat-side.png` | 同一隻的側面（或 3/4）——建模要知道身體厚度與尾巴怎麼捲 | 1024×1024 |
+| `cat-sheet.png`（可選） | 三視圖或表情表（開心／驚訝／閉眼笑）| 任意 |
+
+提示詞錨定（接在共通那段後面）：
+```
+mascot design sheet of a chubby orange tabby kitten plush toy, big round head, small pointed ears, simple dot eyes with highlight,
+tiny pink nose, w-shaped mouth, cream muzzle and belly, curled tail, red collar with a gold bell, front view, neutral pose,
+clean flat background, character design reference
+```
+
+要點：**眼睛用簡單的點或杏仁形**（不要真實眼球）、**顏色不超過四種**、**沒有文字**。
+另一條路：把正面圖丟 Meshy／Tripo 做 image-to-3D 出 GLB 放 `art/incoming/cat.glb`，我接手處理材質名與動畫節點。
