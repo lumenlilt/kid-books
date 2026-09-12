@@ -10,14 +10,16 @@
 
 - **M0 骨架完成**（2026-09-12，commit b462b28）：verify 全綠、四支檢查器各弄壞一次證明會紅、
   Browser pane 直橫向 canvas 尺寸都對。計畫正本 `docs/PLAN-2026-09-12.md`（M0–M6 與完成定義）。
-- **M1 房間＋書架**：尚未開始，卡在兩個等裁示的對外動作（下面）。
+- **M1 房間＋書架**（進行中，2026-09-12）：房間、程式化書架、封面朝外的書（1 真＋4 鎖）、Kenney 擺設、
+  三個虛線裝飾空位、窗外依真實時間變天色、色板跟時間走（白天 morning／傍晚後 dusk，使用者裁示）、
+  Blender bpy 生成的貓（`tools/blender/cat.py`，使用者要求重做）、HUD 骨架、字型子集管線（21 KB）。
+  verify 全綠。**未驗證**：iPad 觸控實際點書／點貓（Browser pane 隱藏時 rAF 不跑，探針測不到互動）、fps。
 
 ## 下一步
 
-1. 取得許可後：`gh repo create lumenlilt/kid-books --public` 並推上去；下載 Kenney 兩包進 `public/assets/`＋LEDGER。
-2. M1 房間＋書架：家具 GLB 進場、書架 6 格（1 真書＋4 剪影）、貓在書架頂、2–3 組色調在瀏覽器切換給使用者選。
+1. 使用者在 Browser pane 打開 `http://localhost:64169/`（dev server 在跑時）實際點書、點貓、點檯燈，回報手感。
+2. M2 開書＋立體書：抽出→飛到閱讀位→翻開→紙雕隨角度立起、DOM 容器貼書頁、關書反向、貓跳到書頁角落。
 
 ## 等使用者裁示
 
-- 建公開 repo `lumenlilt/kid-books`（對外發佈動作，建之前問一次）。
-- 下載 Kenney Furniture Kit 與 Interface Sounds（CC0）進 `public/assets/`。
+- （目前沒有；repo 已公開、素材與字型都已取得許可下載）

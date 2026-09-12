@@ -1,0 +1,9 @@
+{
+  "books": [
+    { "id": "clock", "title": "認識時鐘", "icon": "🕒", "color": "#F4A259", "locked": false },
+    { "id": "bopomofo", "title": "ㄅㄆㄇ", "icon": "ㄅ", "color": "#5B8E7D", "locked": true },
+    { "id": "numbers", "title": "數一數", "icon": "🔢", "color": "#7BA7E0", "locked": true },
+    { "id": "coins", "title": "買東西", "icon": "🪙", "color": "#C77DBB", "locked": true },
+    { "id": "school", "title": "上學去", "icon": "🎒", "color": "#E06C75", "locked": true }
+  ]
+}

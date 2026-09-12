@@ -1,4 +1,41 @@
 {
   "_doc": "第三方素材的來源帳。public/assets 底下每個檔案都要對得上一筆 entry（path 可用 glob），每筆 entry 也要對得上至少一個檔案；tools/check-assets.mjs 會查，tools/build-credits.mjs 用它產 CREDITS.md。欄位：path、pack、author、license（SPDX）、url、retrieved（YYYY-MM-DD）、modified（我們改了什麼，可省）。",
-  "entries": []
+  "entries": [
+    {
+      "path": "models/kenney/furniture/*",
+      "pack": "Kenney Furniture Kit 2.0",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "url": "https://kenney.nl/assets/furniture-kit",
+      "retrieved": "2026-09-12",
+      "modified": "只選用 GLTF format 裡的 13 個 glb 與 License.txt，內容未改"
+    },
+    {
+      "path": "sfx/kenney/*",
+      "pack": "Kenney Interface Sounds 1.0",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "url": "https://kenney.nl/assets/interface-sounds",
+      "retrieved": "2026-09-12",
+      "modified": "選用 12 個，ogg → mp3（ffmpeg，mono 44.1 kHz 96 kbps）——iOS Safari 不支援 Ogg Vorbis"
+    },
+    {
+      "path": "fonts/*",
+      "pack": "jf open 粉圓 2.1（jf-openhuninn）",
+      "author": "justfont",
+      "license": "OFL-1.1",
+      "url": "https://github.com/justfont/open-huninn-font",
+      "retrieved": "2026-09-12",
+      "modified": "依 content/ 實際用字子集成 woff2（tools/build-font.py），manifest.json 記字集；OFL.txt 為原授權"
+    },
+    {
+      "path": "models/cat.glb",
+      "pack": "魔法書房原創：書架上的貓（tools/blender/cat.py 生成）",
+      "author": "Lumenlilt",
+      "license": "CC-BY-4.0",
+      "url": "https://github.com/lumenlilt/kid-books",
+      "retrieved": "2026-09-12",
+      "modified": "Blender 5.2 bpy 程序化建模輸出 GLB，可由腳本重生"
+    }
+  ]
 }

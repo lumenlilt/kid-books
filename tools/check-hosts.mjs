@@ -16,14 +16,25 @@ const URL_RE = /https?:\/\/([a-z0-9.-]+)[^\s"'`)<>]*/gi;
 const failures = [];
 const seen = new Map();
 
+// 三種嚴格度：
+//  - html/css：只有真的會被載入的位置算數（src=、href=、url()），任何外部主機都紅——白名單不適用。
+//  - js/json/webmanifest/svg：字串裡的網址當候選，主機不在文件白名單就紅。
+//  - txt（授權全文）：不掃，裡面的網址是文字不是連線。
+const LOAD_RE = /(?:\b(?:src|href)\s*=\s*["']?|url\(\s*["']?)(https?:\/\/([a-z0-9.-]+)[^\s"')<>]*)/gi;
 for (const p of walk(distDir)) {
-  if (!/\.(html|css|js|json|webmanifest|svg|txt)$/.test(p)) continue;
   const text = readFileSync(p, 'utf8');
-  const isCode = p.endsWith('.js');
-  for (const m of text.matchAll(URL_RE)) {
-    const host = m[1].toLowerCase();
-    seen.set(host, (seen.get(host) ?? 0) + 1);
-    if (isCode ? !DOC_HOSTS.has(host) : host !== 'www.w3.org') failures.push(`${rel(p)}：${m[0].slice(0, 80)}`);
+  if (/\.(html|css)$/.test(p)) {
+    for (const m of text.matchAll(LOAD_RE)) {
+      const host = (m[2] ?? '').toLowerCase();
+      seen.set(host, (seen.get(host) ?? 0) + 1);
+      if (host !== 'www.w3.org') failures.push(`${rel(p)}：會載入外部資源 ${m[1].slice(0, 80)}`);
+    }
+  } else if (/\.(js|json|webmanifest|svg)$/.test(p)) {
+    for (const m of text.matchAll(URL_RE)) {
+      const host = m[1].toLowerCase();
+      seen.set(host, (seen.get(host) ?? 0) + 1);
+      if (!DOC_HOSTS.has(host)) failures.push(`${rel(p)}：${m[0].slice(0, 80)}`);
+    }
   }
 }
 
