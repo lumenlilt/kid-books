@@ -18,6 +18,8 @@ export interface Room {
   props: Map<string, Object3D>;
   slots: DecorationSlot[];
   ready: Promise<void>;
+  /** 把裝飾放進空位（剪影隱藏）；傳 null 清空回剪影 */
+  setDecoration(slotId: string, object: Object3D | null): void;
 }
 
 const _box = new Box3();
@@ -127,5 +129,27 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
     ]);
   })();
 
-  return { group: g, window, props, slots, ready };
+  const mounted = new Map<string, Object3D>();
+  return {
+    group: g,
+    window,
+    props,
+    slots,
+    ready,
+    setDecoration(slotId, object) {
+      const slot = slots.find((x) => x.id === slotId);
+      if (!slot) return;
+      const prev = mounted.get(slotId);
+      if (prev) {
+        g.remove(prev);
+        mounted.delete(slotId);
+      }
+      slot.silhouette.visible = object === null;
+      if (object) {
+        object.position.copy(slot.position);
+        g.add(object);
+        mounted.set(slotId, object);
+      }
+    },
+  };
 }

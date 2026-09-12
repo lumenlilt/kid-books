@@ -20,13 +20,17 @@
 - **M3 時鐘活動完成**（2026-09-12）：`content/books/clock.json`（七頁、33 句台詞，zod＋跨參照驗證）、
   SVG 時鐘控制器（拖、吸附、分針帶時針、示範幽靈指針）、六種活動元件、提示階梯、星星爆開、旁白（字幕＋估時）、
   `tools/tts.py`（say 佔位音檔已產 33 句；azure 後端寫好待跑）。在隱藏的 Browser pane 用 `?turbo=1` 走完整本七頁。
+- **M4 獎勵與人物完成**（2026-09-12）：`app/store.ts`（localStorage 一把 key、版本化遷移、最多四位、注入式 storage＋測試）、
+  選角畫面（四個紙偶 SVG）、HUD 頭像（短按換人、長按家長報告）、讀完書→鏡頭帶去看牆上登場的咕咕鐘（鐘擺、真實時間、鳥探頭）、
+  書脊金書籤、本機家長報告（每頁星／重試／讀完日期）。重新載入後進度與裝飾都從 store 推導。
 
 ## 下一步
 
-1. 使用者聽 Azure HsiaoChen 的四段樣本（pitch／rate／男聲）選聲線 → 全量重產 → M5 播放端（Howler、iOS 解鎖、打斷、貓嘴同步）。
-2. M4 獎勵與人物：咕咕鐘裝飾、選角、localStorage 進度與遷移、本機家長報告。
-3. 使用者在 Browser pane 打開 `http://localhost:64169/?hour=10` 實際玩一遍時鐘書，回報手感與台詞。
+1. **等使用者**：Azure 金鑰失效（401），使用者去入口網站重產／確認區域 → 我產四段聲線樣本讓他選 → 全量重產。
+2. M5 播放端：Howler、iOS 首次觸碰解鎖（選角那一下）、旁白打斷、貓嘴隨音量、SFX 接上（Kenney）。
+3. M6 PWA＋部署：manifest、圖示、service worker、`wrangler deploy`、`check-site.sh`、README。
+4. 使用者在 Browser pane 打開 `http://localhost:64169/?hour=10` 實際玩一遍時鐘書，回報手感與台詞。
 
 ## 等使用者裁示
 
-- （目前沒有；repo 已公開、素材與字型都已取得許可下載）
+- Azure Speech 金鑰：`profit/config/azure-speech.json` 那把回 401；使用者說要去重產。

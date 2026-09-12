@@ -73,6 +73,7 @@ export function createClockChoose(def: Def): Activity {
                 resolve();
               } else {
                 wrong += 1;
+                ctx?.recordAttempt();
                 card.className = 'card is-wrong';
                 void narrator.say(def.wrongSay);
                 if (wrong >= def.maxWrongBeforeShow) {

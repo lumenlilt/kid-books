@@ -44,6 +44,7 @@ export function createClockSet(def: Def): Activity {
             if (def.hands === 'both') cl.ghost(targetTotal);
           },
           demonstrate: async () => {
+            ctx?.recordAttempt();
             cl.setInteractive(false);
             const before = cl.getTotal();
             await untilAbort(cl.animateTo(targetTotal, 1200), signal);

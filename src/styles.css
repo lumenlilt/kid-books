@@ -113,3 +113,30 @@ body {
 .ceremony { text-align: center; color: var(--ink, #3a2e2a); font: 700 28px/1.3 "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .ceremony .badge { font-size: 96px; line-height: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.25)); animation: card-pop .8s cubic-bezier(.34,1.56,.64,1); }
 .ceremony .stars { font-size: 34px; }
+
+/* 選角與家長報告 */
+.picker { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(43,35,64,.55); pointer-events: auto; }
+.picker[hidden] { display: none; }
+.picker-card { background: var(--paper, #fff6e5); color: var(--ink, #3a2e2a); border-radius: 32px; padding: 28px 32px; box-shadow: 0 16px 48px rgba(0,0,0,.3); text-align: center; max-width: 92vw; }
+.picker-title { margin: 0 0 18px; font: 700 34px/1.2 "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif; }
+.picker-row { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.picker-avatar { width: min(22vw, 150px); height: min(22vw, 150px); border-radius: 50%; border: 6px solid var(--ring, #ffb454); background: #fff; padding: 8px; cursor: pointer; transition: transform .15s; }
+.picker-avatar svg { width: 100%; height: 100%; }
+.picker-avatar.is-active { box-shadow: 0 0 0 6px rgba(0,0,0,.12); }
+.picker-avatar:active, .picker-avatar.is-picked { transform: scale(1.12); }
+.hud-avatar.has-avatar { width: 52px; height: 52px; display: inline-flex; }
+.hud-avatar.has-avatar svg { width: 100%; height: 100%; }
+.report { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(43,35,64,.55); pointer-events: auto; overflow: auto; }
+.report[hidden] { display: none; }
+.report-card { background: var(--paper, #fff6e5); color: var(--ink, #3a2e2a); border-radius: 24px; padding: 22px 26px; max-width: min(92vw, 560px); max-height: 88vh; overflow: auto; box-shadow: 0 16px 48px rgba(0,0,0,.3); font: 500 18px/1.5 "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif; }
+.report-head { display: flex; align-items: center; gap: 12px; }
+.report-avatar { width: 56px; height: 56px; display: inline-block; }
+.report-avatar svg { width: 100%; height: 100%; }
+.report-card h2 { margin: 0; font-size: 26px; }
+.report-card h3 { margin: 16px 0 6px; font-size: 20px; }
+.report-card h3 small { font-weight: 500; opacity: .7; font-size: 15px; margin-left: 8px; }
+.report-card table { width: 100%; border-collapse: collapse; }
+.report-card th, .report-card td { padding: 4px 8px; text-align: center; border-bottom: 1px solid rgba(0,0,0,.08); }
+.report-privacy { font-size: 14px; opacity: .7; margin: 16px 0 12px; }
+.report-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.report-actions .hud-btn { font-size: 20px; min-height: 56px; }

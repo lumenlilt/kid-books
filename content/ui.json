@@ -15,5 +15,23 @@
     "next": "下一頁",
     "done": "我看過了",
     "stars": "星星"
+  },
+  "profile": {
+    "title": "誰在玩？",
+    "switch": "換人玩"
+  },
+  "report": {
+    "title": "家長報告",
+    "book": "書",
+    "page": "頁",
+    "stars": "星星",
+    "attempts": "重試",
+    "completed": "讀完：",
+    "notyet": "還沒",
+    "close": "關閉",
+    "privacy": "資料只存在這台裝置裡，不會上傳。"
+  },
+  "room": {
+    "cuckoo": "咕咕鐘"
   }
 }

@@ -1,4 +1,6 @@
 import ui from '../../content/ui.json';
+import type { AvatarId } from '../app/store';
+import { AVATARS } from '../ui/avatars';
 
 export interface Hud {
   root: HTMLElement;
@@ -9,6 +11,9 @@ export interface Hud {
   onSoundToggle(fn: () => void): void;
   onProfile(fn: () => void): void;
   onBack(fn: () => void): void;
+  /** 長按頭像（家長報告） */
+  onProfileLongPress(fn: () => void): void;
+  setAvatar(id: AvatarId | null): void;
   /** 閱讀中：頭像讓位給返回鍵 */
   setReading(on: boolean): void;
 }
@@ -41,9 +46,27 @@ export function createHud(container: HTMLElement): Hud {
   let soundHandler = () => {};
   let profileHandler = () => {};
   let backHandler = () => {};
+  let longHandler = () => {};
   sound?.addEventListener('click', () => soundHandler());
-  profile?.addEventListener('click', () => profileHandler());
   back?.addEventListener('click', () => backHandler());
+  // 頭像：短按換人、長按 600 ms 開家長報告（小孩不會誤入）
+  let pressTimer = 0;
+  let longFired = false;
+  profile?.addEventListener('pointerdown', () => {
+    longFired = false;
+    pressTimer = window.setTimeout(() => {
+      longFired = true;
+      longHandler();
+    }, 600);
+  });
+  const cancelPress = () => window.clearTimeout(pressTimer);
+  profile?.addEventListener('pointerup', cancelPress);
+  profile?.addEventListener('pointercancel', cancelPress);
+  profile?.addEventListener('pointerleave', cancelPress);
+  profile?.addEventListener('click', () => {
+    if (!longFired) profileHandler();
+  });
+  profile?.addEventListener('contextmenu', (e) => e.preventDefault());
   const starTarget = root.querySelector('.hud-stars') ?? root;
   return {
     root,
@@ -64,6 +87,20 @@ export function createHud(container: HTMLElement): Hud {
     },
     onBack(fn) {
       backHandler = fn;
+    },
+    onProfileLongPress(fn) {
+      longHandler = fn;
+    },
+    setAvatar(id) {
+      const el = root.querySelector<HTMLElement>('.hud-avatar');
+      if (!el) return;
+      if (id) {
+        el.innerHTML = AVATARS[id].svg;
+        el.classList.add('has-avatar');
+      } else {
+        el.textContent = '🙂';
+        el.classList.remove('has-avatar');
+      }
     },
     setReading(on) {
       root.classList.toggle('is-reading', on);

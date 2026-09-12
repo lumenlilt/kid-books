@@ -4,6 +4,10 @@ import clockRaw from '../content/books/clock.json';
 import index from '../content/index.json';
 import { ACTIVITY_TYPES } from './activities/registry';
 import { createNarrator } from './app/narrator';
+import { createProgressStore, type StorageLike } from './app/store';
+import { createParentReport } from './overlay/parent-report';
+import { createProfilePicker } from './overlay/profile-picker';
+import { createCuckooClock } from './scene/props/cuckoo-clock';
 import { validateBook } from './content/schema';
 import { createInput } from './app/input';
 import { createLayout } from './app/layout';
@@ -63,11 +67,26 @@ cat.group.rotation.y = Math.PI - 0.3; // Blender +Y 前方在 glTF 是 -Z，轉�
 cat.setHome();
 scene.add(cat.group);
 
+const memoryStorage = (): StorageLike => {
+  const m = new Map<string, string>();
+  return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => void m.set(k, v) };
+};
+let storage: StorageLike;
+try {
+  storage = window.localStorage;
+  storage.getItem('probe');
+} catch {
+  storage = memoryStorage();
+}
+const store = createProgressStore(storage);
+
 const hud = createHud(ui);
-let soundOn = true;
+let soundOn = store.data.settings.sound;
+hud.setSound(soundOn);
 hud.onSoundToggle(() => {
   soundOn = !soundOn;
   hud.setSound(soundOn);
+  store.setSound(soundOn);
 });
 
 const overlay = createBookOverlay(ui);
@@ -75,12 +94,60 @@ overlay.setDebug(debug);
 const clockBook = validateBook(clockRaw, ACTIVITY_TYPES);
 if (!clockBook.book) throw new Error(`content/books/clock.json: ${clockBook.errors.join('; ')}`);
 const narrator = createNarrator({ subtitle: overlay.subtitle, talking: (on) => cat.setTalking(on), speed: params.get('fast') === '1' ? 0.15 : 1 });
+const bookDefs = { clock: clockBook.book };
+const cuckoo = createCuckooClock(palette.accent);
+const countingIds = (id: keyof typeof bookDefs) => bookDefs[id].pages.filter((p) => p.countsForCompletion).map((p) => p.id);
+/** 房間裝飾與書籤全由進度推導：換人、重整都重算 */
+const syncDecorations = () => {
+  const clockDone = store.isBookComplete('clock', countingIds('clock'));
+  room.setDecoration('wall-left', clockDone ? cuckoo.group : null);
+  shelf.books.get('clock')?.setDone(clockDone);
+  hud.setStars(store.totalStars());
+  hud.setAvatar(store.active()?.id ?? null);
+};
 const books = createBookController({
-  scene, camera, renderer, rig, input, shelf, cat, overlay, palette, hour, narrator, hud, uiRoot: ui,
-  books: { clock: clockBook.book },
+  scene, camera, renderer, rig, input, shelf, cat, overlay, palette, hour, narrator, hud, uiRoot: ui, store,
+  books: bookDefs,
   viewport: () => layout.viewport,
   onReading: (on) => hud.setReading(on),
+  onCompleted: (bookId, firstTime) => {
+    if (!firstTime || bookId !== 'clock') {
+      syncDecorations();
+      return;
+    }
+    void (async () => {
+      input.setEnabled(false);
+      rig.parallax = 0;
+      await rig.goTo('decoration', 1000);
+      room.setDecoration('wall-left', cuckoo.group);
+      shelf.books.get('clock')?.setDone(true);
+      await cuckoo.reveal();
+      await cuckoo.pop();
+      await tweens.add({ duration: 1, delay: 500, onUpdate: () => {} }).finished;
+      await rig.goTo('shelf', 900);
+      rig.parallax = 0.12;
+      input.setEnabled(true);
+      syncDecorations();
+    })();
+  },
 });
+input.onTap(cuckoo.group, () => void cuckoo.pop());
+
+const picker = createProfilePicker(ui);
+const report = createParentReport(ui, store, bookDefs, () => void chooseProfile());
+async function chooseProfile(): Promise<void> {
+  const id = await picker.open(store.active()?.id ?? null);
+  store.select(id);
+  syncDecorations();
+}
+hud.onProfile(() => {
+  if (books.state === 'on-shelf' && !picker.isOpen) void chooseProfile();
+});
+hud.onProfileLongPress(() => {
+  if (books.state === 'on-shelf') report.open();
+});
+syncDecorations();
+void chooseProfile();
 hud.onBack(() => void books.close());
 layout.onLayout(() => books.relayout());
 
@@ -128,7 +195,7 @@ let frames = 0;
 let fpsAt = 0;
 let fps = 0;
 const dbg = { frame: 0, lastError: null as unknown };
-if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene, narrator, overlay };
+if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene, narrator, overlay, store, picker, cuckoo };
 const frame = (forcedDt?: number, render = true) => {
   dbg.frame += 1;
   layout.tick();
@@ -137,6 +204,11 @@ const frame = (forcedDt?: number, render = true) => {
   tweens.update(dt);
   cat.update(dt);
   books.update(dt);
+  cuckoo.update(dt);
+  if (cuckoo.group.parent) {
+    const now = new Date();
+    cuckoo.setTime(now.getHours(), now.getMinutes());
+  }
   rig.update(dt, input.pointer);
   if (!render) return;
   renderer.shadowMap.needsUpdate = true;

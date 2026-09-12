@@ -56,6 +56,7 @@ export function createMatchTimeScene(def: Def): Activity {
                 resolve();
               } else {
                 wrong += 1;
+                ctx?.recordAttempt();
                 btn.className = 'card is-wrong';
                 void narrator.say(def.wrongSay);
                 if (wrong >= def.maxWrongBeforeShow) {

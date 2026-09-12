@@ -3,6 +3,7 @@ import { createActivity } from '../activities/registry';
 import type { Activity, ActivityContext } from '../activities/types';
 import { createBookFsm, type BookState } from '../app/book-fsm';
 import type { Narrator } from '../app/narrator';
+import type { ProgressStore } from '../app/store';
 import type { BookDef } from '../content/schema';
 import { fromTotal } from '../lib/clock-math';
 import { burstStars } from '../overlay/stars';
@@ -35,6 +36,9 @@ export interface BookControllerDeps {
   books: Record<string, BookDef>;
   hud: { setStars(n: number): void; starTarget: Element };
   uiRoot: HTMLElement;
+  store: ProgressStore;
+  /** 闔書回架之後：這本書是不是剛第一次讀完（獎勵登場用） */
+  onCompleted?: (bookId: string, firstTime: boolean) => void;
 }
 
 export interface BookController {
@@ -66,9 +70,10 @@ export function createBookController(d: BookControllerDeps): BookController {
   const corners: Vector3[] = [];
   let bookDef: BookDef | null = null;
   let pageIndex = -1;
-  let stars = 0;
   let pageAbort: AbortController | null = null;
   let activity: Activity | null = null;
+  let completedFirstTime = false;
+  const countingIds = (def: BookDef) => def.pages.filter((p) => p.countsForCompletion).map((p) => p.id);
 
   /** 用一台影子鏡頭試距離：整本書＋舞台都要在 NDC ±margin 內 */
   function solveReadingPose(): { position: Vector3; target: Vector3; fov: number } {
@@ -121,7 +126,9 @@ export function createBookController(d: BookControllerDeps): BookController {
     if (!sb || !def || sb.entry.locked || !fsm.send('TAP')) return;
     current = sb;
     bookDef = def;
+    completedFirstTime = false;
     d.narrator.setLines(def.lines);
+    d.store.bookOpened(bookId);
     d.input.setEnabled(false);
     const mesh = sb.mesh;
 
@@ -189,9 +196,12 @@ export function createBookController(d: BookControllerDeps): BookController {
     const perch = catPerch();
     void d.cat.jumpTo(perch.position, perch.rotationY, 650, 0.62);
     d.input.setEnabled(true);
-    stars = 0;
-    d.hud.setStars(0);
-    void startPage(0);
+    d.hud.setStars(d.store.totalStars());
+    // 從第一個還沒拿星的計分頁開始；全部讀完就從頭再玩
+    const pages = def.pages;
+    const progress = d.store.active()?.books[bookId]?.pages ?? {};
+    const firstOpen = pages.findIndex((p) => p.countsForCompletion && !(progress[p.id]?.stars ?? 0));
+    void startPage(firstOpen < 0 ? 0 : firstOpen);
   }
 
   function mirror(total: number): void {
@@ -222,7 +232,8 @@ export function createBookController(d: BookControllerDeps): BookController {
       narrator: d.narrator,
       signal: ac.signal,
       mirror,
-      totalStars: () => stars,
+      totalStars: () => d.store.bookStars(book.id),
+      recordAttempt: () => d.store.recordAttempt(book.id, page.id),
       mountClock(opts = {}) {
         const clock = createClockSvg();
         const box = document.createElement('div');
@@ -237,7 +248,10 @@ export function createBookController(d: BookControllerDeps): BookController {
         return clock;
       },
       complete: () => void completePage(page, i, ac.signal),
-      finish: () => void close(),
+      finish: () => {
+        completedFirstTime = d.store.markBookComplete(book.id, countingIds(book));
+        void close();
+      },
     };
     activity = createActivity(page.activity);
     try {
@@ -256,9 +270,10 @@ export function createBookController(d: BookControllerDeps): BookController {
   async function completePage(page: BookDef['pages'][number], i: number, signal: AbortSignal): Promise<void> {
     if (signal.aborted || !bookDef) return;
     if (page.countsForCompletion) {
-      stars += 1;
+      const first = d.store.recordPage(bookDef.id, page.id);
       const from = d.overlay.deck.firstElementChild ?? d.overlay.deck;
-      void burstStars(from, d.hud.starTarget, d.uiRoot).then(() => d.hud.setStars(stars));
+      if (first) void burstStars(from, d.hud.starTarget, d.uiRoot).then(() => d.hud.setStars(d.store.totalStars()));
+      else void burstStars(from, d.hud.starTarget, d.uiRoot, 4);
     }
     if (page.doneSay) await d.narrator.say(page.doneSay);
     if (signal.aborted) return;
@@ -315,8 +330,12 @@ export function createBookController(d: BookControllerDeps): BookController {
     book.dispose();
     stage = null;
     book = null;
+    const finishedId = current.entry.id;
+    if (bookDef) current.setDone(d.store.isBookComplete(bookDef.id, countingIds(bookDef)));
     current = null;
     d.input.setEnabled(true);
+    d.onCompleted?.(finishedId, completedFirstTime);
+    completedFirstTime = false;
   }
 
   return {
@@ -330,7 +349,7 @@ export function createBookController(d: BookControllerDeps): BookController {
       return pageIndex;
     },
     get stars() {
-      return stars;
+      return bookDef ? d.store.bookStars(bookDef.id) : 0;
     },
     open,
     close,

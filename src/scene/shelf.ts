@@ -16,6 +16,8 @@ export interface ShelfBookEntry {
 export interface ShelfBook {
   entry: ShelfBookEntry;
   mesh: Mesh;
+  /** 讀完：封面上緣一條金色書籤 */
+  setDone(on: boolean): void;
   /** 鎖住的書：晃一下 */
   wiggle(): Promise<unknown>;
   /** 被點到：往前跳一下 */
@@ -58,9 +60,16 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
     locals.set(entry.id, mesh.position.clone());
 
     const baseZ = mesh.position.z;
+    const ribbon = new Mesh(new BoxGeometry(0.05, 0.12, BOOK_SIZE.d + 0.012), paper(0xffd45a, { flat: false }));
+    ribbon.position.set(BOOK_SIZE.w * 0.28, BOOK_SIZE.h / 2 - 0.03, 0);
+    ribbon.visible = false;
+    mesh.add(ribbon);
     books.set(entry.id, {
       entry,
       mesh,
+      setDone(on) {
+        ribbon.visible = on;
+      },
       wiggle: () =>
         tween({
           duration: 600,

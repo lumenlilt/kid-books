@@ -24,6 +24,8 @@ export interface ActivityContext {
   /** 整本書結束（頒獎頁用）：闔書回書架 */
   finish(): void;
   totalStars(): number;
+  /** 答錯／要示範：記進家長報告的重試次數 */
+  recordAttempt(): void;
   signal: AbortSignal;
 }
 
