@@ -19,6 +19,8 @@ export interface Cat {
   setMouth(level: number): void;
   /** 記住現在的位置與朝向當「家」（書架頂） */
   setHome(): void;
+  /** 抬頭／低頭（弧度，負值抬頭）：在書角時鏡頭從上往下看，抬一點才像在看小孩 */
+  setHeadPitch(rad: number): void;
   /** 拋物線跳到世界座標某點並轉向 */
   jumpTo(target: Vector3, rotationY: number, ms?: number, scale?: number): Promise<unknown>;
   jumpHome(ms?: number): Promise<unknown>;
@@ -59,6 +61,7 @@ export async function createCat(accent: number): Promise<Cat> {
   let blinkPhase = -1;
   let talking = false;
   let mouthLevel = 0;
+  let headPitch = 0;
   const basePos = new Vector3();
   const home = new Vector3();
   let homeRotY = 0;
@@ -70,6 +73,7 @@ export async function createCat(accent: number): Promise<Cat> {
       t += dt;
       if (body) body.scale.y = baseScaleY * (1 + Math.sin(t * 2.2) * 0.02); // 呼吸
       if (head && headRot) {
+        head.rotation.x = headRot.x + headPitch;
         head.rotation.z = headRot.z + Math.sin(t * 0.7) * 0.06;
         head.rotation.y = headRot.y + Math.sin(t * 0.45) * 0.14;
       }
@@ -116,6 +120,9 @@ export async function createCat(accent: number): Promise<Cat> {
     setHome() {
       home.copy(g.position);
       homeRotY = g.rotation.y;
+    },
+    setHeadPitch(rad) {
+      headPitch = rad;
     },
     jumpTo,
     jumpHome(ms = 650) {

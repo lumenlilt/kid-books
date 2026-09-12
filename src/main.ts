@@ -1,5 +1,5 @@
 import './styles.css';
-import { Color, PerspectiveCamera, Scene, Timer } from 'three';
+import { Color, DefaultLoadingManager, PerspectiveCamera, Scene, Timer } from 'three';
 import clockRaw from '../content/books/clock.json';
 import index from '../content/index.json';
 import { ACTIVITY_TYPES } from './activities/registry';
@@ -31,8 +31,47 @@ const canvas = document.getElementById('gl');
 const ui = document.getElementById('ui');
 if (!(canvas instanceof HTMLCanvasElement) || !(ui instanceof HTMLElement)) throw new Error('missing #gl or #ui');
 
+const boot = document.getElementById('boot');
+const bootBar = boot?.querySelector<HTMLElement>('.boot-bar b') ?? null;
+DefaultLoadingManager.onProgress = (_url, loaded, total) => {
+  if (bootBar && total > 0) bootBar.style.width = `${Math.max(4, Math.round((loaded / total) * 100))}%`;
+};
+let booted = false;
+function dismissBoot(): void {
+  if (booted) return;
+  booted = true;
+  if (bootBar) bootBar.style.width = '100%';
+  boot?.classList.add('is-done');
+  boot?.addEventListener('transitionend', () => boot.remove());
+  window.setTimeout(() => boot?.remove(), 800); // 背景分頁計時器被節流時的保險
+  // PWA：正式建置才註冊 service worker（tools/build-sw.mjs 產的 /sw.js），離線也能整本玩。
+  // 放在第一幀之後而不是 load 事件：預快取 82 檔 4.7 MB 會跟首屏的模型與貼圖搶頻寬（2026-09-13 iPhone 首開空白十幾秒的原因之一）。
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    window.setTimeout(() => navigator.serviceWorker.register('/sw.js').catch(() => undefined), 1500);
+  }
+}
 const params = new URLSearchParams(window.location.search);
 const debug = params.get('debug') === '1';
+const dbg: { frame: number; lastError: string | null; snapshot?: (name: string) => Promise<string> } = { frame: 0, lastError: null };
+// 除錯面板一開始就掛上去：開機途中掛掉也看得到錯誤（2026-09-13 iPhone 只有一片紫底，就是這種死法）
+const debugPanel = debug ? document.createElement('div') : null;
+if (debugPanel) {
+  debugPanel.className = 'debug-panel';
+  debugPanel.textContent = 'booting';
+  ui.append(debugPanel);
+}
+if (debug) {
+  // 實機（iPhone／iPad）沒接線也看得到錯誤：面板最後一行印出來
+  const show = (msg: string) => {
+    dbg.lastError = msg;
+    if (debugPanel) debugPanel.textContent = `err ${msg}`;
+  };
+  window.addEventListener('error', (e) => show(`${e.message} @${(e.filename ?? '').split('/').pop()}:${e.lineno}`));
+  window.addEventListener('unhandledrejection', (e) => {
+    const r = (e as PromiseRejectionEvent).reason;
+    show(r instanceof Error ? `${r.message}\n${(r.stack ?? '').split('\n').slice(0, 3).join(' | ')}` : String(r));
+  });
+}
 const hour = currentHour();
 const palette = resolvePalette(hour);
 document.documentElement.style.setProperty('--paper', hex(palette.paper));
@@ -168,7 +207,14 @@ hud.onProfileLongPress(() => {
   if (books.state === 'on-shelf') report.open();
 });
 syncDecorations();
-void chooseProfile();
+void chooseProfile().then(() => {
+  const openId = debug ? params.get('open') : null;
+  if (openId) void books.open(openId);
+});
+if (debug && params.get('pick')) {
+  // 選角畫面一出現就替使用者點下去（實機截圖用）
+  window.setTimeout(() => picker.root.querySelector<HTMLButtonElement>(`.picker-avatar[data-id="${params.get('pick')}"]`)?.click(), 300);
+}
 hud.onBack(() => void books.close());
 layout.onLayout(() => books.relayout());
 
@@ -214,17 +260,11 @@ void room.ready.then(() => {
   renderer.shadowMap.needsUpdate = true;
 });
 
-const debugPanel = debug ? document.createElement('div') : null;
-if (debugPanel) {
-  debugPanel.className = 'debug-panel';
-  ui.append(debugPanel);
-}
 
 const timer = new Timer();
 let frames = 0;
 let fpsAt = 0;
 let fps = 0;
-const dbg: { frame: number; lastError: unknown; snapshot?: (name: string) => Promise<string> } = { frame: 0, lastError: null };
 if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene, narrator, overlay, store, picker, cuckoo, audio };
 const frame = (forcedDt?: number, render = true) => {
   dbg.frame += 1;
@@ -247,6 +287,7 @@ const frame = (forcedDt?: number, render = true) => {
   renderer.shadowMap.needsUpdate = true;
   if (postfx) postfx.render();
   else renderer.render(scene, camera);
+  if (!booted) dismissBoot();
   if (debugPanel) {
     frames += 1;
     const now = performance.now() / 1000;
@@ -256,7 +297,7 @@ const frame = (forcedDt?: number, render = true) => {
       fpsAt = now;
       const { calls, triangles } = renderer.info.render;
       const vp = layout.viewport;
-      debugPanel.textContent = `fps ${fps.toFixed(0)}  calls ${calls}  tris ${triangles}  book ${books.state}\n${vp.width}x${vp.height}@${vp.dpr}  palette ${palette.name}  hour ${hour.toFixed(1)}`;
+      debugPanel.textContent = `fps ${fps.toFixed(0)}  calls ${calls}  tris ${triangles}  book ${books.state}\n${vp.width}x${vp.height}@${vp.dpr}  palette ${palette.name}  hour ${hour.toFixed(1)}${dbg.lastError ? `\nerr ${dbg.lastError}` : ''}`;
     }
   }
 };
@@ -294,12 +335,6 @@ if (params.get('turbo') === '1') {
   }, 100);
 }
 
-// PWA：正式建置才註冊 service worker（tools/build-sw.mjs 產的 /sw.js），離線也能整本玩
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => undefined);
-  });
-}
 
 canvas.addEventListener('webglcontextlost', (event) => {
   event.preventDefault();

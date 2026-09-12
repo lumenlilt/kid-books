@@ -199,6 +199,7 @@ export function createBookController(d: BookControllerDeps): BookController {
     d.overlay.show();
     d.onReading?.(true);
     const perch = catPerch();
+    d.cat.setHeadPitch(-0.26); // 書角時鏡頭在上方：抬頭 15° 才像在看小孩（2026-09-13 使用者裁示）
     void d.cat.jumpTo(perch.position, perch.rotationY, 650, 0.62);
     d.input.setEnabled(true);
     d.hud.setStars(d.store.totalStars());
@@ -302,6 +303,7 @@ export function createBookController(d: BookControllerDeps): BookController {
     d.overlay.hide();
     d.onReading?.(false);
     d.audio.sfx('close');
+    d.cat.setHeadPitch(0);
     void d.cat.jumpHome();
     await tween({
       duration: 800,
