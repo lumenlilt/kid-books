@@ -1,5 +1,6 @@
-import { CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, SphereGeometry, type BufferGeometry, type Material } from 'three';
+import { CanvasTexture, CircleGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Shape, type BufferGeometry, type Material } from 'three';
 import { segment } from '../../lib/fit-rect';
+import { loadModel } from '../assets';
 import { paper, roundedBox } from '../materials';
 import { skyColorAt } from '../window';
 
@@ -124,19 +125,40 @@ export function createClockStage(): ClockStage {
     cs.closePath();
     return geo(new ExtrudeGeometry(cs, { depth: 0.014, bevelEnabled: true, bevelSize: 0.008, bevelThickness: 0.005, bevelSegments: 3 }));
   };
-  // 樹：圓滾滾的兩層樹冠
-  const tree = (x: number, scale: number) => {
-    const trunk = mesh(geo(new CylinderGeometry(0.02 * scale, 0.025 * scale, 0.14 * scale, 10)), mat(paper(0x8a5a3c)));
-    trunk.position.set(x, 0.07 * scale, 0.03);
-    back.add(trunk);
-    const c1 = mesh(geo(new SphereGeometry(0.075 * scale, 16, 12)), mat(paper(0x6fbf73)));
-    c1.position.set(x, 0.17 * scale, 0.03);
-    const c2 = mesh(geo(new SphereGeometry(0.055 * scale, 16, 12)), mat(paper(0x8fd48f)));
-    c2.position.set(x + 0.03 * scale, 0.24 * scale, 0.035);
-    back.add(c1, c2);
+  // 舞台物件（tools/blender/stage.py，D32）：依材質名套色；載入是非同步的，先把位置留好
+  const stageMats: Record<string, MeshStandardMaterial> = {
+    Wall: mat(paper(0xfbe6bf, { roughness: 0.75 })), WallDark: mat(paper(0xe6c79a, { roughness: 0.75 })),
+    Roof: mat(paper(0xd9534f, { roughness: 0.65 })), RoofDark: mat(paper(0xb34040, { roughness: 0.65 })),
+    Door: mat(paper(0x8a5a3c, { roughness: 0.75 })), ClockFace: mat(paper(0xfffdf5, { roughness: 0.6 })), ClockRim: mat(paper(0x8a5a3c, { roughness: 0.6 })),
+    Gold: mat(paper(0xffd45a, { roughness: 0.45 })), Trunk: mat(paper(0x8a5a3c, { roughness: 0.8 })),
+    Leaf: mat(paper(0x6fbf73, { roughness: 0.7 })), LeafDark: mat(paper(0x4f9f5a, { roughness: 0.7 })), Fence: mat(paper(0xfff6e5, { roughness: 0.7 })),
   };
-  tree(-0.47, 1.0);
-  tree(0.46, 0.85);
+  const glowMat = mat(paper(0xfff1a8, { flat: false }));
+  glowMat.emissive.setHex(0xffd36a);
+  glowMat.emissiveIntensity = 0.15;
+  stageMats['Glow'] = glowMat;
+  const place = (name: string, parent: Group, x: number, y: number, z: number, scale = 1, rotY = 0) => {
+    const holder = new Group();
+    holder.position.set(x, y, z);
+    holder.scale.setScalar(scale);
+    holder.rotation.y = rotY;
+    parent.add(holder);
+    void loadModel(`/assets/models/stage-${name}.glb`).then((model) => {
+      model.traverse((o) => {
+        if (o instanceof Mesh && !Array.isArray(o.material)) {
+          const m = stageMats[o.material.name];
+          if (m) o.material = m;
+          o.castShadow = true;
+          o.receiveShadow = true;
+        }
+      });
+      holder.add(model);
+    });
+    return holder;
+  };
+  // 舞台座標：物件「站」在頁面上時 Y 沿頁面法線——rotation.x 由 setRise 控制；物件本身以 Y 為上。
+  place('tree', back, -0.47, 0, 0.03, 1.0);
+  place('tree', back, 0.46, 0, 0.03, 0.85, 0.6);
   const cloudMat = mat(paper(0xffffff, { flat: false }));
   const cloudA = mesh(cloudGeo(0.26), cloudMat);
   cloudA.position.set(-0.32, 0.5, 0.006);
@@ -151,100 +173,35 @@ export function createClockStage(): ClockStage {
   back.add(moon);
   g.add(back);
 
-  // 鐘樓（中層）
+  // 鐘樓（中層）：模型由 GLB 提供；鐘面中心在 (0, 0.36, 0.16)，指針與軸心由程式畫（要動）
   const mid = new Group();
   mid.position.set(0.12, 0.12, 0.012);
   mid.scale.setScalar(0.85);
-  const tower = mesh(geo(roundedBox(0.3, 0.55, 0.06)), mat(paper(0xf3d9b1)));
-  tower.position.set(0, 0.275, 0);
-  mid.add(tower);
-  const roof = mesh(geo(new ConeGeometry(0.22, 0.2, 24)), mat(paper(0xd9534f)));
-  roof.position.set(0, 0.64, 0);
-  
-  mid.add(roof);
-  const towerDoor = mesh(geo(roundedBox(0.09, 0.14, 0.012)), mat(paper(0x8a5a3c, { flat: false })));
-  towerDoor.position.set(0, 0.07, 0.034);
-  mid.add(towerDoor);
-  const glowMat = mat(paper(0xfff1a8, { flat: false }));
-  glowMat.emissive.setHex(0xffd36a);
-  glowMat.emissiveIntensity = 0.15;
-  for (const wx of [-0.08, 0.08]) {
-    const win = mesh(geo(roundedBox(0.05, 0.06, 0.01)), glowMat);
-    win.position.set(wx, 0.2, 0.034);
-    mid.add(win);
-  }
-  const pole = mesh(geo(new CylinderGeometry(0.006, 0.006, 0.12, 6)), mat(paper(0x3a2e2a, { flat: false })));
-  pole.position.set(0, 0.78, 0);
-  mid.add(pole);
-  const flag = mesh(geo(roundedBox(0.07, 0.045, 0.006)), mat(paper(0xffd45a, { flat: false })));
-  flag.position.set(0.04, 0.81, 0);
-  mid.add(flag);
-  const face = mesh(geo(new CylinderGeometry(0.115, 0.115, 0.02, 32)), mat(paper(0xfffdf5, { flat: false })));
-  face.rotation.x = Math.PI / 2;
-  face.position.set(0, 0.36, 0.04);
-  mid.add(face);
-  const rim = mesh(geo(new CylinderGeometry(0.13, 0.13, 0.012, 32)), mat(paper(0x8a5a3c, { flat: false })));
-  rim.rotation.x = Math.PI / 2;
-  rim.position.set(0, 0.36, 0.032);
-  mid.add(rim);
-  for (let i = 0; i < 12; i += 1) {
-    const tick = mesh(geo(roundedBox(i % 3 === 0 ? 0.02 : 0.012, i % 3 === 0 ? 0.03 : 0.02, 0.006)), mat(paper(0x3a2e2a, { flat: false })));
-    const a = (i / 12) * Math.PI * 2;
-    tick.position.set(Math.sin(a) * 0.095, 0.36 + Math.cos(a) * 0.095, 0.052);
-    tick.rotation.z = -a;
-    mid.add(tick);
-  }
+  place('tower', mid, 0, 0, 0, 1);
   const hourHand = new Group();
-  hourHand.position.set(0, 0.36, 0.056);
-  const hourMesh = mesh(geo(roundedBox(0.02, 0.065, 0.008)), mat(paper(0x3a2e2a, { flat: false })));
+  hourHand.position.set(0, 0.36, 0.178);
+  const hourMesh = mesh(geo(roundedBox(0.02, 0.065, 0.008, 0.004)), mat(paper(0x3a2e2a, { flat: false })));
   hourMesh.position.y = 0.028;
   hourHand.add(hourMesh);
   const minuteHand = new Group();
-  minuteHand.position.set(0, 0.36, 0.062);
-  const minuteMesh = mesh(geo(roundedBox(0.014, 0.095, 0.008)), mat(paper(0xd9534f, { flat: false })));
+  minuteHand.position.set(0, 0.36, 0.184);
+  const minuteMesh = mesh(geo(roundedBox(0.014, 0.095, 0.008, 0.004)), mat(paper(0xd9534f, { flat: false })));
   minuteMesh.position.y = 0.042;
   minuteHand.add(minuteMesh);
   const pin = mesh(geo(new CylinderGeometry(0.012, 0.012, 0.02, 12)), mat(paper(0xffd45a, { flat: false })));
   pin.rotation.x = Math.PI / 2;
-  pin.position.set(0, 0.36, 0.066);
+  pin.position.set(0, 0.36, 0.19);
   mid.add(hourHand, minuteHand, pin);
   g.add(mid);
 
-  // 小屋（前層）
+  // 小屋（前層）＋籬笆＋灌木：GLB
   const front = new Group();
   front.position.set(-0.36, -0.2, 0.018);
   front.scale.setScalar(0.9);
-  const house = mesh(geo(roundedBox(0.26, 0.2, 0.06)), mat(paper(0xfff1dc)));
-  house.position.set(0, 0.1, 0);
-  front.add(house);
-  const houseRoof = mesh(geo(new ConeGeometry(0.19, 0.16, 24)), mat(paper(0x5b8e7d)));
-  houseRoof.position.set(0, 0.27, 0);
-  
-  front.add(houseRoof);
-  const door = mesh(geo(roundedBox(0.06, 0.1, 0.01)), mat(paper(0x8a5a3c, { flat: false })));
-  door.position.set(0.04, 0.05, 0.034);
-  front.add(door);
-  const houseWin = mesh(geo(roundedBox(0.05, 0.05, 0.01)), glowMat);
-  houseWin.position.set(-0.06, 0.11, 0.034);
-  front.add(houseWin);
-  // 籬笆：右側幾根圓柱＋兩條橫桿
-  const fenceMat = mat(paper(0xfff6e5, { flat: false }));
-  for (let i = 0; i < 5; i += 1) {
-    const post = mesh(geo(roundedBox(0.03, 0.12, 0.03, 0.012)), fenceMat);
-    post.position.set(0.5 + i * 0.09, 0.06, 0);
-    front.add(post);
-  }
-  for (const ry of [0.04, 0.085]) {
-    const rail = mesh(geo(roundedBox(0.42, 0.02, 0.02, 0.008)), fenceMat);
-    rail.position.set(0.68, ry, 0);
-    front.add(rail);
-  }
-  const chimney = mesh(geo(roundedBox(0.04, 0.09, 0.04)), mat(paper(0xb5654a)));
-  chimney.position.set(-0.08, 0.27, 0);
-  front.add(chimney);
-  const bush = mesh(geo(new CylinderGeometry(0.07, 0.09, 0.09, 8)), mat(paper(0x7cc76f)));
-  bush.position.set(0.55, 0.045, 0);
-  front.add(bush);
+  place('house', front, 0, 0, 0, 1);
+  place('bush', front, 0.5, 0, 0.02, 1.1);
+  place('bush', front, 0.86, 0, -0.02, 0.8, 1.2);
+  place('fence', front, 0.9, 0, 0, 1);
   g.add(front);
 
   const layers: Array<{ group: Group; from: number; to: number; base: number }> = [

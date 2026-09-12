@@ -50,3 +50,4 @@
 - [ ] [⑤] TypeScript 7／Vite／Vitest 大版升級（D18 釘住的）
 - [ ] [⑤] LICENSE-CONTENT 內嵌 CC BY 4.0 全文（現在只放連結）
 - [ ] [⑤⑨] **Cloudflare Web Analytics 自動注入要關**（2026-09-12 首次部署抓到）：zone 層級開關在 HTML 注入 `static.cloudflareinsights.com/beacon.min.js`，CSP 有擋、`tools/check-site.sh` 已加探針會紅；要使用者到 dashboard 關掉。
+- [ ] [⑤] GLB 壓縮（meshopt／Draco）：模型總量 2.2 MB，小熊一個 323 KB；iPad 首次載入與 SW 預快取都吃它

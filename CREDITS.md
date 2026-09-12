@@ -12,3 +12,4 @@
 | 魔法書房原創：書架 v2（tools/blender/bookcase.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/bookcase.glb` |
 | 魔法書房原創：窗戶 v2（tools/blender/window.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/window.glb` |
 | 魔法書房原創：房間擺設（tools/blender/props.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/prop-*.glb` |
+| 魔法書房原創：時鐘書舞台物件（tools/blender/stage.py 生成） | Lumenlilt | CC-BY-4.0 | <https://github.com/lumenlilt/kid-books> | `models/stage-*.glb` |

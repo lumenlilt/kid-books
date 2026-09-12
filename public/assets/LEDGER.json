@@ -63,6 +63,15 @@
       "url": "https://github.com/lumenlilt/kid-books",
       "retrieved": "2026-09-13",
       "modified": "Blender 5.2 bpy 程序建模輸出 GLB，可由腳本重生"
+    },
+    {
+      "path": "models/stage-*.glb",
+      "pack": "魔法書房原創：時鐘書舞台物件（tools/blender/stage.py 生成）",
+      "author": "Lumenlilt",
+      "license": "CC-BY-4.0",
+      "url": "https://github.com/lumenlilt/kid-books",
+      "retrieved": "2026-09-13",
+      "modified": "Blender 5.2 bpy 程序建模輸出 GLB，可由腳本重生"
     }
   ]
 }
