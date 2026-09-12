@@ -1,4 +1,4 @@
-import { CanvasTexture, MeshStandardMaterial, RepeatWrapping, type Material, type Texture } from 'three';
+import { CanvasTexture, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, Vector2, type Material, type Texture } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 let grain: Texture | null = null;
@@ -99,4 +99,38 @@ export function paper(color: number, opts: { roughness?: number; flat?: boolean;
 export function roundedBox(w: number, h: number, d: number, radius?: number, segments = 4): RoundedBoxGeometry {
   const r = radius ?? Math.min(0.05, Math.min(w, h, d) / 6);
   return new RoundedBoxGeometry(w, h, d, segments, r);
+}
+
+const loader = new TextureLoader();
+const texCache = new Map<string, Texture>();
+
+function loadTex(url: string, srgb: boolean, repeat: number): Texture {
+  const key = `${url}|${repeat}`;
+  let t = texCache.get(key);
+  if (!t) {
+    t = loader.load(url);
+    t.wrapS = RepeatWrapping;
+    t.wrapT = RepeatWrapping;
+    t.repeat.set(repeat, repeat);
+    t.anisotropy = 4;
+    if (srgb) t.colorSpace = SRGBColorSpace;
+    texCache.set(key, t);
+  }
+  return t;
+}
+
+/**
+ * PBR 貼圖組（Poly Haven CC0，public/assets/textures/<name>-{diffuse,normal,rough}.jpg）套到玩具材質上：
+ * 顏色仍由色板決定（tint 乘上 diffuse），貼圖只提供紋理與凹凸——換色板不用換圖。
+ */
+export function texturedToy(name: 'floor' | 'wall' | 'rug' | 'wood', tint: number, opts: { repeat?: number; roughness?: number; normalScale?: number; flat?: boolean; gain?: number } = {}): MeshStandardMaterial {
+  const repeat = opts.repeat ?? 2;
+  const m = paper(tint, { roughness: opts.roughness ?? 0.85, flat: opts.flat ?? false });
+  // 貼圖的平均亮度大多在 0.4–0.6，乘上色板色會整體變暗：用 gain 把色板色抬回來（color 可以超過 1）
+  m.color.multiplyScalar(opts.gain ?? 1.6);
+  m.map = loadTex(`/assets/textures/${name}-diffuse.jpg`, true, repeat);
+  m.normalMap = loadTex(`/assets/textures/${name}-normal.jpg`, false, repeat);
+  m.normalScale = new Vector2(opts.normalScale ?? 0.6, opts.normalScale ?? 0.6);
+  m.roughnessMap = loadTex(`/assets/textures/${name}-rough.jpg`, false, repeat);
+  return m;
 }

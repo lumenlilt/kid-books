@@ -1,8 +1,7 @@
 import { Box3, BoxGeometry, EdgesGeometry, Group, LineDashedMaterial, LineSegments, Mesh, MeshStandardMaterial, PlaneGeometry, Vector3, type Object3D } from 'three';
 import { createDecor, type Decor } from './decor';
 import { makeBear, makeBookStack, makeFloorLamp, makePlant, makeRadio, makeSideTable } from './props/furniture';
-import { woodFloorTexture } from './decor';
-import { paper } from './materials';
+import { paper, texturedToy } from './materials';
 import type { Palette } from './palette';
 import { createWindow, type RoomWindow } from './window';
 
@@ -56,14 +55,14 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
   const g = new Group();
   const props = new Map<string, Object3D>();
 
-  const floorMat = paper(palette.floor, { flat: false });
-  floorMat.map = woodFloorTexture(palette);
+  // 地板：Poly Haven 木板貼圖染上色板的地板色（D29）
+  const floorMat = texturedToy('floor', 0xf3dcc0, { repeat: 4, roughness: 0.7, normalScale: 0.5, gain: 1.35 });
   const floor = new Mesh(new PlaneGeometry(9, 9), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   g.add(floor);
 
-  const wallMat = paper(palette.wall, { flat: false });
+  const wallMat = texturedToy('wall', palette.wall, { repeat: 3, roughness: 0.95, normalScale: 0.35, gain: 1.7 });
   const back = new Mesh(new PlaneGeometry(9, 3.4), wallMat);
   back.position.set(0, 1.7, -2.5);
   back.receiveShadow = true;

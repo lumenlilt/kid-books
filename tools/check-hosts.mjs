@@ -11,7 +11,7 @@ if (!existsSync(distDir)) {
   console.error('✘ check:hosts：沒有 dist/，先 npm run build');
   process.exit(1);
 }
-const DOC_HOSTS = new Set(['threejs.org', 'github.com', 'developer.mozilla.org', 'www.w3.org', 'www.khronos.org', 'registry.khronos.org', 'creativecommons.org', 'kenney.nl', 'opensource.org', 'jcgt.org', 'json-schema.org']);
+const DOC_HOSTS = new Set(['threejs.org', 'github.com', 'developer.mozilla.org', 'www.w3.org', 'www.khronos.org', 'registry.khronos.org', 'creativecommons.org', 'kenney.nl', 'opensource.org', 'jcgt.org', 'json-schema.org', 'polyhaven.com']);
 const URL_RE = /https?:\/\/([a-z0-9.-]+)[^\s"'`)<>]*/gi;
 const failures = [];
 const seen = new Map();

@@ -23,12 +23,12 @@ export function createLights(scene: Scene, palette: Palette, shadowSize: number,
     pmrem.dispose();
   }
 
-  const hemi = new HemisphereLight(palette.skyLight, palette.floor, 0.55);
+  const hemi = new HemisphereLight(palette.skyLight, 0xd9b8a0, 0.5);
   scene.add(hemi);
 
   // 主光：暖、從右前上方（窗戶那側）
-  const sun = new DirectionalLight(0xfff0dc, 2.4);
-  sun.position.set(3.2, 5.5, 3.5);
+  const sun = new DirectionalLight(0xfff0dc, 2.9);
+  sun.position.set(3.4, 5.2, 2.8);
   sun.castShadow = true;
   sun.shadow.mapSize.set(shadowSize, shadowSize);
   sun.shadow.camera.near = 1;
@@ -44,7 +44,8 @@ export function createLights(scene: Scene, palette: Palette, shadowSize: number,
   scene.add(sun);
 
   // 補光：冷、從左前，不投影，把陰影面撐起來
-  const fill = new DirectionalLight(0xd6e6ff, 0.7);
+  // 補光帶藍：陰影面就帶色，不會死灰
+  const fill = new DirectionalLight(0xbcd4ff, 0.75);
   fill.position.set(-4, 3, 3);
   scene.add(fill);
 
@@ -72,7 +73,7 @@ export function createLights(scene: Scene, palette: Palette, shadowSize: number,
     lamp,
     setNight(amount) {
       night = amount;
-      sun.intensity = 2.4 - amount * 1.9;
+      sun.intensity = 2.9 - amount * 2.3;
       sun.color.setHex(amount > 0.5 ? 0xbcc8ff : 0xfff0dc);
       fill.intensity = 0.7 - amount * 0.35;
       hemi.intensity = 0.55 - amount * 0.3;

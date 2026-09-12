@@ -27,6 +27,15 @@
       "url": "https://github.com/lumenlilt/kid-books",
       "retrieved": "2026-09-12",
       "modified": "Blender 5.2 bpy 程序化建模輸出 GLB，可由腳本重生"
+    },
+    {
+      "path": "textures/*",
+      "pack": "Poly Haven textures（plank_flooring_02、beige_wall_001、curly_teddy_natural、brown_planks_04）",
+      "author": "Poly Haven contributors",
+      "license": "CC0-1.0",
+      "url": "https://polyhaven.com/textures",
+      "retrieved": "2026-09-13",
+      "modified": "1K JPG 縮到 512、重新命名為 floor/wall/rug/wood-{diffuse,normal,rough}"
     }
   ]
 }

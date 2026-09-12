@@ -5,7 +5,7 @@ import {
   Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, RepeatWrapping, Shape, ShapeGeometry, SphereGeometry, SRGBColorSpace,
   TorusGeometry, TubeGeometry, Vector3,
 } from 'three';
-import { paper, roundedBox } from './materials';
+import { paper, roundedBox, texturedToy } from './materials';
 import { hex, type Palette } from './palette';
 
 export interface Decor {
@@ -223,14 +223,20 @@ export function createDecor(palette: Palette): Decor {
   }
 
   // 圓地毯
-  const rug = new Mesh(new CircleGeometry(1.25, 48), new MeshStandardMaterial({ map: rugTexture(palette), roughness: 1 }));
+  const rugMat = texturedToy('rug', palette.rug, { repeat: 2.5, roughness: 1, normalScale: 1.2, gain: 1.25 });
+  const rug = new Mesh(new CircleGeometry(1.25, 48), rugMat);
+  const rugRim = new Mesh(new TorusGeometry(1.25, 0.04, 10, 64), paper(palette.paper));
+  rugRim.rotation.x = Math.PI / 2;
+  rugRim.position.set(0, 0.02, 0.55);
+  rugRim.castShadow = true;
+  g.add(rugRim);
   rug.rotation.x = -Math.PI / 2;
   rug.position.set(0, 0.02, 0.55); // 貼著地板會 z-fighting 消失（2026-09-12 實測），墊高 2 cm；往書架靠一點，書架視角看得到毯緣
   rug.receiveShadow = true;
   g.add(rug);
 
   // 半牆護牆板＋橫條
-  const wainscot = new Mesh(new PlaneGeometry(9, 0.95), paper(palette.wallTrim, { flat: false }));
+  const wainscot = new Mesh(new PlaneGeometry(9, 0.95), texturedToy('wood', palette.wallTrim, { repeat: 6, roughness: 0.8, normalScale: 0.4, gain: 1.9 }));
   wainscot.position.set(0, 0.475, -2.495);
   wainscot.receiveShadow = true;
   g.add(wainscot);

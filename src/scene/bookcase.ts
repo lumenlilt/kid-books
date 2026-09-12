@@ -1,5 +1,5 @@
 import { Group, Mesh, Vector3 } from 'three';
-import { paper, roundedBox } from './materials';
+import { paper, roundedBox, texturedToy } from './materials';
 import type { Palette } from './palette';
 
 /** 程式化書架：格位由我們決定，不綁在別人模型的層板高度上（DECISIONS D19）。 */
@@ -20,8 +20,8 @@ export function createBookcase(palette: Palette): Bookcase {
   const d = 0.42;
   const t = 0.05;
   const g = new Group();
-  const wood = paper(palette.wood);
-  const dark = paper(palette.woodDark);
+  const wood = texturedToy('wood', palette.wood, { repeat: 2, roughness: 0.75, normalScale: 0.45, gain: 2.5 });
+  const dark = texturedToy('wood', palette.woodDark, { repeat: 2, roughness: 0.85, normalScale: 0.3, gain: 2.1 });
 
   const add = (sx: number, sy: number, sz: number, x: number, y: number, z: number, m = wood) => {
     const mesh = new Mesh(roundedBox(sx, sy, sz), m);
