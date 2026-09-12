@@ -1,4 +1,4 @@
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Vector3, type Object3D } from 'three';
 import { easeOutElastic, tween } from '../lib/tween';
 import type { Bookcase } from './bookcase';
 import { makeCoverTexture } from './book-cover';
@@ -26,6 +26,8 @@ export interface Shelf {
   group: Group;
   books: Map<string, ShelfBook>;
   hitTargets(): Object3D[];
+  /** 某本書在格位上的姿態：世界座標（飛回去用）與書架本地座標（歸位用） */
+  slotWorld(id: string): { position: Vector3; local: Vector3; rotationX: number };
 }
 
 export const BOOK_SIZE = { w: 0.255, h: 0.4, d: 0.05 } as const;
@@ -34,6 +36,7 @@ export const BOOK_SIZE = { w: 0.255, h: 0.4, d: 0.05 } as const;
 export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palette: Palette): Shelf {
   const group = new Group();
   const books = new Map<string, ShelfBook>();
+  const locals = new Map<string, Vector3>();
   const geometry = new BoxGeometry(BOOK_SIZE.w, BOOK_SIZE.h, BOOK_SIZE.d);
   const lean = -0.12;
 
@@ -52,6 +55,7 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
     mesh.rotation.x = lean;
     mesh.name = `book:${entry.id}`;
     group.add(mesh);
+    locals.set(entry.id, mesh.position.clone());
 
     const baseZ = mesh.position.z;
     books.set(entry.id, {
@@ -79,5 +83,10 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
     group,
     books,
     hitTargets: () => [...books.values()].map((b) => b.mesh),
+    slotWorld(id) {
+      const local = locals.get(id) ?? new Vector3();
+      group.updateMatrixWorld(true);
+      return { position: group.localToWorld(local.clone()), local: local.clone(), rotationX: lean };
+    },
   };
 }

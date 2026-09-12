@@ -13,6 +13,8 @@ export interface CameraRig {
   readonly pose: PoseName;
   poses: Record<PoseName, Pose>;
   goTo(name: PoseName, ms?: number): Promise<void>;
+  /** 不動畫、直接到位（轉向重算時用） */
+  snapTo(name: PoseName): void;
   /** 每幀：套視差（指標 -1..1）並 lookAt */
   update(dt: number, pointer: { x: number; y: number; active: boolean }): void;
   /** 視差幅度（世界單位）；閱讀時設 0 */
@@ -56,6 +58,20 @@ export function createCameraRig(camera: PerspectiveCamera): CameraRig {
         },
       }).finished;
       moving = false;
+    },
+    snapTo(name) {
+      const to = poses[name];
+      current = name;
+      basePos.copy(to.position);
+      baseTarget.copy(to.target);
+      baseFov = to.fov;
+      camera.fov = baseFov;
+      camera.updateProjectionMatrix();
+      // 立刻到位：呼叫端接著就要用鏡頭矩陣投影，不能等下一幀的 update()
+      offset.set(0, 0, 0);
+      camera.position.copy(basePos);
+      camera.lookAt(baseTarget);
+      camera.updateMatrixWorld(true);
     },
     update(dt, pointer) {
       const amount = moving ? 0 : rig.parallax;

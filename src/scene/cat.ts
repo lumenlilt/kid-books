@@ -1,5 +1,5 @@
 import { Group, Mesh, MeshStandardMaterial, Vector3, type Object3D } from 'three';
-import { easeOutBack, tween } from '../lib/tween';
+import { easeInOutSine, easeOutBack, lerp, tween } from '../lib/tween';
 import { loadModel } from './assets';
 import { fitHeight } from './room';
 
@@ -14,6 +14,11 @@ export interface Cat {
   poke(): Promise<unknown>;
   /** 講話中：嘴巴開合 */
   setTalking(on: boolean): void;
+  /** 記住現在的位置與朝向當「家」（書架頂） */
+  setHome(): void;
+  /** 拋物線跳到世界座標某點並轉向 */
+  jumpTo(target: Vector3, rotationY: number, ms?: number, scale?: number): Promise<unknown>;
+  jumpHome(ms?: number): Promise<unknown>;
 }
 
 const CAT_HEIGHT = 0.56;
@@ -48,6 +53,9 @@ export async function createCat(accent: number): Promise<Cat> {
   let blinkPhase = -1;
   let talking = false;
   const basePos = new Vector3();
+  const home = new Vector3();
+  let homeRotY = 0;
+  const jumpTo = makeJump(g);
 
   return {
     group: g,
@@ -95,5 +103,39 @@ export async function createCat(accent: number): Promise<Cat> {
     setTalking(on) {
       talking = on;
     },
+    setHome() {
+      home.copy(g.position);
+      homeRotY = g.rotation.y;
+    },
+    jumpTo,
+    jumpHome(ms = 650) {
+      return jumpTo(home.clone(), homeRotY, ms);
+    },
+  };
+}
+
+function makeJump(g: Group) {
+  return (target: Vector3, rotationY: number, ms = 650, scale = 1): Promise<unknown> => {
+      const from = g.position.clone();
+      const fromRot = g.rotation.y;
+      const fromScale = g.scale.y;
+      const arc = 0.45 + from.distanceTo(target) * 0.15;
+      return tween({
+        duration: ms,
+        ease: easeInOutSine,
+        onUpdate: (k) => {
+          g.position.lerpVectors(from, target, k);
+          g.position.y += Math.sin(k * Math.PI) * arc;
+          g.rotation.y = lerp(fromRot, rotationY, k);
+          // 起跳蹲一下、落地回彈
+          const squash = 1 - Math.sin(k * Math.PI) * 0.06;
+          const base = lerp(fromScale, scale, k);
+          g.scale.set(base / squash, base * squash, base / squash);
+        },
+      }).finished.then(() => {
+        g.position.copy(target);
+        g.rotation.y = rotationY;
+        g.scale.setScalar(scale);
+      });
   };
 }

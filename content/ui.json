@@ -1,5 +1,16 @@
 {
-  "app": { "title": "魔法書房" },
-  "hud": { "profile": "誰在玩", "stars": "星星", "sound": "聲音" },
-  "shelf": { "locked": "這本書還在寫，先把時鐘書讀完吧！" }
+  "app": {
+    "title": "魔法書房"
+  },
+  "hud": {
+    "profile": "誰在玩",
+    "stars": "星星",
+    "sound": "聲音"
+  },
+  "shelf": {
+    "locked": "這本書還在寫，先把時鐘書讀完吧！"
+  },
+  "book": {
+    "close": "回書架"
+  }
 }

@@ -42,3 +42,14 @@ body {
   background: rgba(0,0,0,.6); color: #fff; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
   pointer-events: none; white-space: pre;
 }
+
+.book-overlay { position: absolute; inset: 0; pointer-events: none; }
+.book-overlay[hidden] { display: none; }
+.book-frame {
+  position: absolute; left: var(--book-x, 0px); top: var(--book-y, 0px); width: var(--book-w, 0px); height: var(--book-h, 0px);
+  pointer-events: none; border-radius: 12px;
+}
+.book-overlay.is-debug .book-frame { outline: 2px dashed #ff3b8d; outline-offset: -1px; }
+.book-debug { position: absolute; left: 12px; bottom: 56px; padding: 4px 8px; background: rgba(255,59,141,.85); color: #fff; font: 12px ui-monospace, monospace; border-radius: 6px; }
+.hud-left { display: flex; gap: 12px; }
+.hud-back[hidden], .hud-profile[hidden] { display: none; }

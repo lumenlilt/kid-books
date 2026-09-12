@@ -4,7 +4,9 @@ import index from '../content/index.json';
 import { createInput } from './app/input';
 import { createLayout } from './app/layout';
 import { tweens } from './lib/tween';
+import { createBookOverlay } from './overlay/book-overlay';
 import { createHud } from './overlay/hud';
+import { createBookController } from './scene/book-controller';
 import { createBookcase } from './scene/bookcase';
 import { createCameraRig } from './scene/camera-rig';
 import { createCat } from './scene/cat';
@@ -54,6 +56,7 @@ scene.add(shelf.group);
 const cat = await createCat(palette.accent);
 cat.group.position.set(bookcase.group.position.x + 0.5, bookcase.top.y, bookcase.group.position.z + 0.02);
 cat.group.rotation.y = Math.PI - 0.3; // Blender +Y 前方在 glTF 是 -Z，轉過來面對鏡頭
+cat.setHome();
 scene.add(cat.group);
 
 const hud = createHud(ui);
@@ -62,6 +65,16 @@ hud.onSoundToggle(() => {
   soundOn = !soundOn;
   hud.setSound(soundOn);
 });
+
+const overlay = createBookOverlay(ui);
+overlay.setDebug(debug);
+const books = createBookController({
+  scene, camera, renderer, rig, input, shelf, cat, overlay, palette, hour,
+  viewport: () => layout.viewport,
+  onReading: (on) => hud.setReading(on),
+});
+hud.onBack(() => void books.close());
+layout.onLayout(() => books.relayout());
 
 // 時間 → 天色與燈光
 room.window.setHour(hour);
@@ -72,8 +85,9 @@ lights.setLamp(lampOn);
 // 互動：什麼都可以摸
 for (const book of shelf.books.values()) {
   input.onTap(book.mesh, () => {
+    if (books.state !== 'on-shelf') return;
     if (book.entry.locked) void book.wiggle();
-    else void book.bounce();
+    else void books.open(book.entry.id);
   });
 }
 input.onTap(cat.group, () => void cat.poke());
@@ -106,14 +120,15 @@ let frames = 0;
 let fpsAt = 0;
 let fps = 0;
 const dbg = { frame: 0, lastError: null as unknown };
-if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera };
-renderer.setAnimationLoop(() => {
+if (debug) (window as unknown as { __kb: unknown }).__kb = { dbg, renderer, layout, camera, books, cat, input, scene };
+const frame = (forcedDt?: number) => {
   dbg.frame += 1;
   layout.tick();
   timer.update();
-  const dt = Math.min(timer.getDelta(), 0.05);
+  const dt = forcedDt ?? Math.min(timer.getDelta(), 0.05);
   tweens.update(dt);
   cat.update(dt);
+  books.update(dt);
   rig.update(dt, input.pointer);
   renderer.shadowMap.needsUpdate = true;
   renderer.render(scene, camera);
@@ -126,10 +141,24 @@ renderer.setAnimationLoop(() => {
       fpsAt = now;
       const { calls, triangles } = renderer.info.render;
       const vp = layout.viewport;
-      debugPanel.textContent = `fps ${fps.toFixed(0)}  calls ${calls}  tris ${triangles}\n${vp.width}x${vp.height}@${vp.dpr}  palette ${palette.name}  hour ${hour.toFixed(1)}`;
+      debugPanel.textContent = `fps ${fps.toFixed(0)}  calls ${calls}  tris ${triangles}  book ${books.state}\n${vp.width}x${vp.height}@${vp.dpr}  palette ${palette.name}  hour ${hour.toFixed(1)}`;
     }
   }
-});
+};
+renderer.setAnimationLoop(() => frame());
+// 除錯用：分頁被隱藏時瀏覽器不給 rAF、計時器也被節流到每秒一次，動畫序列會凍住；
+// 只在 ?debug=1 時，每次計時器觸發就用固定步長推進一秒份的幀，讓隱藏狀態下一秒還是一秒。
+if (debug) {
+  let last = performance.now();
+  window.setInterval(() => {
+    const now = performance.now();
+    const elapsed = Math.min(2, (now - last) / 1000);
+    last = now;
+    if (!document.hidden) return;
+    const steps = Math.max(1, Math.round(elapsed * 30));
+    for (let i = 0; i < steps; i += 1) frame(elapsed / steps);
+  }, 100);
+}
 
 canvas.addEventListener('webglcontextlost', (event) => {
   event.preventDefault();

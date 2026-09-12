@@ -6,7 +6,12 @@ export interface Hud {
   setSound(on: boolean): void;
   onSoundToggle(fn: () => void): void;
   onProfile(fn: () => void): void;
+  onBack(fn: () => void): void;
+  /** 閱讀中：頭像讓位給返回鍵 */
+  setReading(on: boolean): void;
 }
+
+const backSvg = `<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M14 6l-6 6 6 6" stroke="currentColor" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 const speakerSvg = (on: boolean) =>
   `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>${
@@ -18,7 +23,10 @@ export function createHud(container: HTMLElement): Hud {
   const root = document.createElement('div');
   root.className = 'hud';
   root.innerHTML = `
-    <button class="hud-btn hud-profile" type="button" aria-label="${ui.hud.profile}"><span class="hud-avatar">🙂</span></button>
+    <div class="hud-left">
+      <button class="hud-btn hud-profile" type="button" aria-label="${ui.hud.profile}"><span class="hud-avatar">🙂</span></button>
+      <button class="hud-btn hud-back" type="button" aria-label="${ui.book.close}" hidden>${backSvg}</button>
+    </div>
     <div class="hud-right">
       <div class="hud-pill hud-stars" aria-label="${ui.hud.stars}"><span class="hud-star">⭐</span><span class="hud-count">0</span></div>
       <button class="hud-btn hud-sound" type="button" aria-label="${ui.hud.sound}" aria-pressed="true">${speakerSvg(true)}</button>
@@ -27,10 +35,13 @@ export function createHud(container: HTMLElement): Hud {
   const count = root.querySelector<HTMLElement>('.hud-count');
   const sound = root.querySelector<HTMLButtonElement>('.hud-sound');
   const profile = root.querySelector<HTMLButtonElement>('.hud-profile');
+  const back = root.querySelector<HTMLButtonElement>('.hud-back');
   let soundHandler = () => {};
   let profileHandler = () => {};
+  let backHandler = () => {};
   sound?.addEventListener('click', () => soundHandler());
   profile?.addEventListener('click', () => profileHandler());
+  back?.addEventListener('click', () => backHandler());
   return {
     root,
     setStars(n) {
@@ -46,6 +57,14 @@ export function createHud(container: HTMLElement): Hud {
     },
     onProfile(fn) {
       profileHandler = fn;
+    },
+    onBack(fn) {
+      backHandler = fn;
+    },
+    setReading(on) {
+      root.classList.toggle('is-reading', on);
+      if (profile) profile.hidden = on;
+      if (back) back.hidden = !on;
     },
   };
 }
