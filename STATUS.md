@@ -8,12 +8,15 @@
 
 ## 進行中
 
-（還沒填）
+- **M0 骨架**（2026-09-12）：Vite＋TS＋three 空場景、四支檢查器、授權、DECISIONS D01–D18、CI。
+  計畫正本 `docs/PLAN-2026-09-12.md`（M0–M6 與完成定義）。
 
 ## 下一步
 
-（還沒填）
+1. M0 收尾：`npm run verify` 全綠、Browser pane 看到有光的紙藝方塊、iPad 尺寸旋轉不變形 → commit。
+2. M1 房間＋書架：Kenney 家具（要先取得下載許可）、書架 6 格、貓在書架頂、2–3 組色調給使用者選。
 
 ## 等使用者裁示
 
-（沒有）
+- 建公開 repo `lumenlilt/kid-books`（對外發佈動作，建之前問一次）。
+- 下載 Kenney Furniture Kit 與 Interface Sounds（CC0）進 `public/assets/`。

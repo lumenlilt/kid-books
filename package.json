@@ -1,0 +1,38 @@
+{
+  "name": "kid-books",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "魔法書房 Magic Bookroom — a 3D pop-up bookshelf that teaches Taiwanese kindergarten-to-first-grade topics.",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check:audio": "node tools/check-audio.mjs",
+    "check:assets": "node tools/check-assets.mjs",
+    "check:font": "node tools/check-font.mjs",
+    "check:hosts": "node tools/check-hosts.mjs",
+    "verify": "bash tools/verify.sh",
+    "deploy": "bash tools/verify.sh && wrangler deploy && bash tools/check-site.sh books.lumenlilt.app"
+  },
+  "dependencies": {
+    "howler": "2.2.4",
+    "three": "0.186.0",
+    "zod": "4.6.2"
+  },
+  "devDependencies": {
+    "@types/howler": "2.2.13",
+    "@types/node": "^22.20.2",
+    "@types/three": "0.186.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.0",
+    "wrangler": "4.131.1"
+  }
+}

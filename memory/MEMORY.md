@@ -5,4 +5,4 @@
 > **每條一行、只放指標＋為什麼，內容放 repo**——兩邊都寫同一件事會漂移。
 > 狀態型記憶（會靜默變假的）寫入時就標 `volatile: true` + `verify_by:`。
 
-（還沒有記憶。第一條寫在這行下面。）
+- [Azure 金鑰住在 profit](azure-speech-key-lives-in-profit.md) — 旁白 TTS 用環境變數讀 profit/config 的金鑰，不複製進公開 repo

@@ -1,0 +1,14 @@
+# 內容授權 — CC BY 4.0
+
+本 repo 的**課程內容**（`content/` 底下的書本文字與旁白台詞、`public/audio/` 的旁白音檔）
+與**原創美術**（我們自己畫的 SVG、程式幾何模型、圖示）以
+Creative Commons Attribution 4.0 International（CC BY 4.0）授權。
+
+- 法律條文：https://creativecommons.org/licenses/by/4.0/legalcode
+- 摘要：https://creativecommons.org/licenses/by/4.0/
+- 標示方式：「魔法書房 Magic Bookroom by Lumenlilt，CC BY 4.0，https://github.com/lumenlilt/kid-books」
+
+程式碼（`src/`、`tools/`、設定檔）另以 MIT 授權，見 `LICENSE`。
+第三方素材（`public/assets/`）各依其原授權，清單見 `CREDITS.md`（由 `public/assets/LEDGER.json` 產生）。
+
+註：純 AI 生成的圖像在部分司法管轄區（例如美國）不受著作權保護；對那些檔案，本授權只是宣告，不構成權利主張。

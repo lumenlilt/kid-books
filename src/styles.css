@@ -1,0 +1,15 @@
+:root { color-scheme: light; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #2b2340; }
+body {
+  position: fixed; inset: 0;
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  font-family: "Huninn", -apple-system, "PingFang TC", system-ui, sans-serif;
+}
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#ui {
+  position: fixed; inset: 0; pointer-events: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+#ui > * { pointer-events: auto; }

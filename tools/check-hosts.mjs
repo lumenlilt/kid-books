@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+// 建置產物裡不准有第三方網址：這是兒童產品，零外連是硬規則（CSP 也只允許 'self'）。
+// JS 裡的字串網址只當「候選」報出來——three.js 的警告訊息會附文件連結，那不是連線；
+// 所以用主機名白名單：白名單以外的任何主機一律紅，由人判斷後再加進白名單。
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { ROOT, walk, rel, report } from './_lib.mjs';
+
+const distDir = join(ROOT, 'dist');
+if (!existsSync(distDir)) {
+  console.error('✘ check:hosts：沒有 dist/，先 npm run build');
+  process.exit(1);
+}
+const DOC_HOSTS = new Set(['threejs.org', 'github.com', 'developer.mozilla.org', 'www.w3.org', 'www.khronos.org', 'registry.khronos.org', 'creativecommons.org', 'kenney.nl', 'opensource.org', 'jcgt.org']);
+const URL_RE = /https?:\/\/([a-z0-9.-]+)[^\s"'`)<>]*/gi;
+const failures = [];
+const seen = new Map();
+
+for (const p of walk(distDir)) {
+  if (!/\.(html|css|js|json|webmanifest|svg|txt)$/.test(p)) continue;
+  const text = readFileSync(p, 'utf8');
+  const isCode = p.endsWith('.js');
+  for (const m of text.matchAll(URL_RE)) {
+    const host = m[1].toLowerCase();
+    seen.set(host, (seen.get(host) ?? 0) + 1);
+    if (isCode ? !DOC_HOSTS.has(host) : host !== 'www.w3.org') failures.push(`${rel(p)}：${m[0].slice(0, 80)}`);
+  }
+}
+
+report('check:hosts', failures, `外部主機 ${seen.size} 個，全部在文件白名單內（${[...seen.keys()].join(', ') || '無'}）`);

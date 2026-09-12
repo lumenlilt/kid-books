@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kid-books",
+  "compatibility_date": "2026-09-01",
+  // assets-only Worker：沒有 main，靜態檔直接服務；SPA fallback 讓深層路徑回 index.html
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+  "observability": { "enabled": false },
+  // 一個 App 一個 Worker（同 evertend），不要把 books 加進 runway/site 那個 lumenlilt Worker 的 routes
+  "routes": [{ "pattern": "books.lumenlilt.app", "custom_domain": true }]
+}
