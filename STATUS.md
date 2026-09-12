@@ -8,13 +8,14 @@
 
 ## 進行中
 
-- **M0 骨架**（2026-09-12）：Vite＋TS＋three 空場景、四支檢查器、授權、DECISIONS D01–D18、CI。
-  計畫正本 `docs/PLAN-2026-09-12.md`（M0–M6 與完成定義）。
+- **M0 骨架完成**（2026-09-12，commit b462b28）：verify 全綠、四支檢查器各弄壞一次證明會紅、
+  Browser pane 直橫向 canvas 尺寸都對。計畫正本 `docs/PLAN-2026-09-12.md`（M0–M6 與完成定義）。
+- **M1 房間＋書架**：尚未開始，卡在兩個等裁示的對外動作（下面）。
 
 ## 下一步
 
-1. M0 收尾：`npm run verify` 全綠、Browser pane 看到有光的紙藝方塊、iPad 尺寸旋轉不變形 → commit。
-2. M1 房間＋書架：Kenney 家具（要先取得下載許可）、書架 6 格、貓在書架頂、2–3 組色調給使用者選。
+1. 取得許可後：`gh repo create lumenlilt/kid-books --public` 並推上去；下載 Kenney 兩包進 `public/assets/`＋LEDGER。
+2. M1 房間＋書架：家具 GLB 進場、書架 6 格（1 真書＋4 剪影）、貓在書架頂、2–3 組色調在瀏覽器切換給使用者選。
 
 ## 等使用者裁示
 
