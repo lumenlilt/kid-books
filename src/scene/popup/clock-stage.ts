@@ -1,6 +1,6 @@
-import { BoxGeometry, CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, type BufferGeometry, type Material } from 'three';
+import { CanvasTexture, CircleGeometry, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape, type BufferGeometry, type Material } from 'three';
 import { segment } from '../../lib/fit-rect';
-import { paper } from '../materials';
+import { paper, roundedBox } from '../materials';
 import { skyColorAt } from '../window';
 
 /**
@@ -83,7 +83,7 @@ export function createClockStage(): ClockStage {
   skyShape.lineTo(-sw / 2 + r, sh);
   skyShape.quadraticCurveTo(-sw / 2, sh, -sw / 2, sh - r);
   skyShape.closePath();
-  const sky = mesh(geo(new ExtrudeGeometry(skyShape, { depth: 0.012, bevelEnabled: false })), skyMat);
+  const sky = mesh(geo(new ExtrudeGeometry(skyShape, { depth: 0.02, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.008, bevelSegments: 3 })), skyMat);
   sky.position.set(0, 0, -0.012);
   back.add(sky);
   const hill = (w: number, h: number, color: number, x: number, z: number) => {
@@ -92,7 +92,7 @@ export function createClockStage(): ClockStage {
     hs.quadraticCurveTo(-w / 4, h, 0, h * 0.85);
     hs.quadraticCurveTo(w / 4, h * 1.05, w / 2, 0);
     hs.closePath();
-    const m = mesh(geo(new ExtrudeGeometry(hs, { depth: 0.01, bevelEnabled: false })), mat(paper(color, { flat: false })));
+    const m = mesh(geo(new ExtrudeGeometry(hs, { depth: 0.016, bevelEnabled: true, bevelSize: 0.01, bevelThickness: 0.006, bevelSegments: 3 })), mat(paper(color, { flat: false })));
     m.position.set(x, 0, z);
     back.add(m);
   };
@@ -106,7 +106,7 @@ export function createClockStage(): ClockStage {
     cs.absarc(w * 0.28, 0.01, w * 0.2, Math.PI * 1.15, Math.PI * 2, false);
     cs.lineTo(w / 2, 0);
     cs.closePath();
-    return geo(new ExtrudeGeometry(cs, { depth: 0.008, bevelEnabled: false }));
+    return geo(new ExtrudeGeometry(cs, { depth: 0.014, bevelEnabled: true, bevelSize: 0.008, bevelThickness: 0.005, bevelSegments: 3 }));
   };
   const cloudMat = mat(paper(0xffffff, { flat: false }));
   const cloudA = mesh(cloudGeo(0.26), cloudMat);
@@ -126,25 +126,25 @@ export function createClockStage(): ClockStage {
   const mid = new Group();
   mid.position.set(0.12, 0.12, 0.012);
   mid.scale.setScalar(0.85);
-  const tower = mesh(geo(new BoxGeometry(0.3, 0.55, 0.06)), mat(paper(0xf3d9b1)));
+  const tower = mesh(geo(roundedBox(0.3, 0.55, 0.06)), mat(paper(0xf3d9b1)));
   tower.position.set(0, 0.275, 0);
   mid.add(tower);
-  const roof = mesh(geo(new ConeGeometry(0.24, 0.18, 4)), mat(paper(0xd9534f)));
+  const roof = mesh(geo(new ConeGeometry(0.22, 0.2, 24)), mat(paper(0xd9534f)));
   roof.position.set(0, 0.64, 0);
-  roof.rotation.y = Math.PI / 4;
+  
   mid.add(roof);
-  const towerDoor = mesh(geo(new BoxGeometry(0.09, 0.14, 0.012)), mat(paper(0x8a5a3c, { flat: false })));
+  const towerDoor = mesh(geo(roundedBox(0.09, 0.14, 0.012)), mat(paper(0x8a5a3c, { flat: false })));
   towerDoor.position.set(0, 0.07, 0.034);
   mid.add(towerDoor);
   for (const wx of [-0.08, 0.08]) {
-    const win = mesh(geo(new BoxGeometry(0.05, 0.06, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+    const win = mesh(geo(roundedBox(0.05, 0.06, 0.01)), mat(paper(0xfff1a8, { flat: false })));
     win.position.set(wx, 0.2, 0.034);
     mid.add(win);
   }
   const pole = mesh(geo(new CylinderGeometry(0.006, 0.006, 0.12, 6)), mat(paper(0x3a2e2a, { flat: false })));
   pole.position.set(0, 0.78, 0);
   mid.add(pole);
-  const flag = mesh(geo(new BoxGeometry(0.07, 0.045, 0.006)), mat(paper(0xffd45a, { flat: false })));
+  const flag = mesh(geo(roundedBox(0.07, 0.045, 0.006)), mat(paper(0xffd45a, { flat: false })));
   flag.position.set(0.04, 0.81, 0);
   mid.add(flag);
   const face = mesh(geo(new CylinderGeometry(0.115, 0.115, 0.02, 32)), mat(paper(0xfffdf5, { flat: false })));
@@ -156,7 +156,7 @@ export function createClockStage(): ClockStage {
   rim.position.set(0, 0.36, 0.032);
   mid.add(rim);
   for (let i = 0; i < 12; i += 1) {
-    const tick = mesh(geo(new BoxGeometry(i % 3 === 0 ? 0.02 : 0.012, i % 3 === 0 ? 0.03 : 0.02, 0.006)), mat(paper(0x3a2e2a, { flat: false })));
+    const tick = mesh(geo(roundedBox(i % 3 === 0 ? 0.02 : 0.012, i % 3 === 0 ? 0.03 : 0.02, 0.006)), mat(paper(0x3a2e2a, { flat: false })));
     const a = (i / 12) * Math.PI * 2;
     tick.position.set(Math.sin(a) * 0.095, 0.36 + Math.cos(a) * 0.095, 0.052);
     tick.rotation.z = -a;
@@ -164,12 +164,12 @@ export function createClockStage(): ClockStage {
   }
   const hourHand = new Group();
   hourHand.position.set(0, 0.36, 0.056);
-  const hourMesh = mesh(geo(new BoxGeometry(0.02, 0.065, 0.008)), mat(paper(0x3a2e2a, { flat: false })));
+  const hourMesh = mesh(geo(roundedBox(0.02, 0.065, 0.008)), mat(paper(0x3a2e2a, { flat: false })));
   hourMesh.position.y = 0.028;
   hourHand.add(hourMesh);
   const minuteHand = new Group();
   minuteHand.position.set(0, 0.36, 0.062);
-  const minuteMesh = mesh(geo(new BoxGeometry(0.014, 0.095, 0.008)), mat(paper(0xd9534f, { flat: false })));
+  const minuteMesh = mesh(geo(roundedBox(0.014, 0.095, 0.008)), mat(paper(0xd9534f, { flat: false })));
   minuteMesh.position.y = 0.042;
   minuteHand.add(minuteMesh);
   const pin = mesh(geo(new CylinderGeometry(0.012, 0.012, 0.02, 12)), mat(paper(0xffd45a, { flat: false })));
@@ -182,20 +182,20 @@ export function createClockStage(): ClockStage {
   const front = new Group();
   front.position.set(-0.36, -0.2, 0.018);
   front.scale.setScalar(0.9);
-  const house = mesh(geo(new BoxGeometry(0.26, 0.2, 0.06)), mat(paper(0xfff1dc)));
+  const house = mesh(geo(roundedBox(0.26, 0.2, 0.06)), mat(paper(0xfff1dc)));
   house.position.set(0, 0.1, 0);
   front.add(house);
-  const houseRoof = mesh(geo(new ConeGeometry(0.2, 0.14, 4)), mat(paper(0x5b8e7d)));
+  const houseRoof = mesh(geo(new ConeGeometry(0.19, 0.16, 24)), mat(paper(0x5b8e7d)));
   houseRoof.position.set(0, 0.27, 0);
-  houseRoof.rotation.y = Math.PI / 4;
+  
   front.add(houseRoof);
-  const door = mesh(geo(new BoxGeometry(0.06, 0.1, 0.01)), mat(paper(0x8a5a3c, { flat: false })));
+  const door = mesh(geo(roundedBox(0.06, 0.1, 0.01)), mat(paper(0x8a5a3c, { flat: false })));
   door.position.set(0.04, 0.05, 0.034);
   front.add(door);
-  const houseWin = mesh(geo(new BoxGeometry(0.05, 0.05, 0.01)), mat(paper(0xfff1a8, { flat: false })));
+  const houseWin = mesh(geo(roundedBox(0.05, 0.05, 0.01)), mat(paper(0xfff1a8, { flat: false })));
   houseWin.position.set(-0.06, 0.11, 0.034);
   front.add(houseWin);
-  const chimney = mesh(geo(new BoxGeometry(0.04, 0.09, 0.04)), mat(paper(0xb5654a)));
+  const chimney = mesh(geo(roundedBox(0.04, 0.09, 0.04)), mat(paper(0xb5654a)));
   chimney.position.set(-0.08, 0.27, 0);
   front.add(chimney);
   const bush = mesh(geo(new CylinderGeometry(0.07, 0.09, 0.09, 8)), mat(paper(0x7cc76f)));

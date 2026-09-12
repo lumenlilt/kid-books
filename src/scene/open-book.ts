@@ -1,5 +1,5 @@
 import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial, Vector3, type Texture } from 'three';
-import { paper } from './materials';
+import { paper, roundedBox } from './materials';
 
 export interface OpenBookOptions {
   pageW: number;
@@ -36,8 +36,8 @@ export class OpenBook {
     const coverFace = new MeshStandardMaterial({ map: o.cover, roughness: 0.9, metalness: 0 });
     this.disposables.push(pages, coverSide, coverFace);
 
-    const block = new BoxGeometry(pageW, pageH, t);
-    const coverGeo = new BoxGeometry(pageW + m, pageH + 2 * m, c);
+    const block = roundedBox(pageW, pageH, t);
+    const coverGeo = roundedBox(pageW + m, pageH + 2 * m, c);
     this.disposables.push(block, coverGeo);
 
     const right = new Mesh(block, pages);

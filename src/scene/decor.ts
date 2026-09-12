@@ -190,7 +190,7 @@ export function createDecor(palette: Palette): Decor {
   const cloudMat = paper(0xffffff, { flat: false });
   const clouds: Mesh[] = [];
   [[-2.5, 2.55, -1.3, 0.42], [-2.9, 2.85, -1.0, 0.3], [-2.15, 2.95, -1.6, 0.34]].forEach(([x, y, z, w], i) => {
-    const geo = new ExtrudeGeometry(cloudShape(w ?? 0.4, (w ?? 0.4) * 0.5), { depth: 0.03, bevelEnabled: false });
+    const geo = new ExtrudeGeometry(cloudShape(w ?? 0.4, (w ?? 0.4) * 0.5), { depth: 0.05, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.015, bevelSegments: 4 });
     const m = new Mesh(geo, cloudMat);
     m.position.set(x ?? 0, y ?? 0, z ?? 0);
     m.castShadow = true;

@@ -2,15 +2,6 @@
   "_doc": "第三方素材的來源帳。public/assets 底下每個檔案都要對得上一筆 entry（path 可用 glob），每筆 entry 也要對得上至少一個檔案；tools/check-assets.mjs 會查，tools/build-credits.mjs 用它產 CREDITS.md。欄位：path、pack、author、license（SPDX）、url、retrieved（YYYY-MM-DD）、modified（我們改了什麼，可省）。 public/icons/ 是 tools/blender/icon.py 由 cat.glb 渲染的原創圖示（CC BY 4.0），不在本帳範圍。",
   "entries": [
     {
-      "path": "models/kenney/furniture/*",
-      "pack": "Kenney Furniture Kit 2.0",
-      "author": "Kenney (kenney.nl)",
-      "license": "CC0-1.0",
-      "url": "https://kenney.nl/assets/furniture-kit",
-      "retrieved": "2026-09-12",
-      "modified": "只選用 GLTF format 裡的 13 個 glb 與 License.txt，內容未改"
-    },
-    {
       "path": "sfx/kenney/*",
       "pack": "Kenney Interface Sounds 1.0",
       "author": "Kenney (kenney.nl)",

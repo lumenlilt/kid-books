@@ -1,6 +1,6 @@
 import { Box3, BoxGeometry, EdgesGeometry, Group, LineDashedMaterial, LineSegments, Mesh, MeshStandardMaterial, PlaneGeometry, Vector3, type Object3D } from 'three';
-import { loadModel, modelUrl } from './assets';
 import { createDecor, type Decor } from './decor';
+import { makeBear, makeBookStack, makeFloorLamp, makePlant, makeRadio, makeSideTable } from './props/furniture';
 import { woodFloorTexture } from './decor';
 import { paper } from './materials';
 import type { Palette } from './palette';
@@ -102,36 +102,23 @@ export function createRoom(palette: Palette, lowerShelfY = 0.55): Room {
   addSlot('floor-right', new Vector3(2.4, 0.2, 0.2), new Vector3(0.4, 0.4, 0.4));
   addSlot('table-top', new Vector3(-2.35, 0.75, -1.7), new Vector3(0.22, 0.26, 0.22));
 
-  const place = async (name: string, height: number, x: number, z: number, rotY = 0) => {
-    const m = await loadModel(modelUrl(name));
-    fitHeight(m, height);
-    const holder = new Group();
-    holder.add(m);
-    holder.position.set(x, 0, z);
-    holder.rotation.y = rotY;
-    holder.name = `prop:${name}`;
-    g.add(holder);
-    props.set(name, holder);
-    return holder;
+  // 擺設全是自製圓潤模型（玩具風，D27）；名字沿用舊的 Kenney 名以免點擊註冊處要改
+  const place = (name: string, obj: Group, x: number, y: number, z: number, rotY = 0) => {
+    obj.position.set(x, y, z);
+    obj.rotation.y = rotY;
+    obj.name = `prop:${name}`;
+    g.add(obj);
+    props.set(name, obj);
+    return obj;
   };
-
-  const ready = (async () => {
-    await Promise.all([
-      place('lampRoundFloor', 1.45, -2.4, -0.7),
-      place('sideTable', 0.55, -2.35, -1.7),
-      place('pottedPlant', 0.95, 2.5, -1.7),
-      place('plantSmall1', 0.28, -0.55, -2.05).then((h) => {
-        h.position.y = lowerShelfY;
-      }),
-      place('books', 0.16, 0.35, -2.05, 0.4).then((h) => {
-        h.position.y = lowerShelfY;
-      }),
-      place('bear', 0.38, 1.35, 0.55, -0.6),
-      place('radio', 0.22, 2.5, -1.7).then((h) => {
-        h.position.set(2.9, 0, -2.0);
-      }),
-    ]);
-  })();
+  place('lampRoundFloor', makeFloorLamp(palette), -2.4, 0, -0.7);
+  place('sideTable', makeSideTable(palette), -2.35, 0, -1.7);
+  place('pottedPlant', makePlant(palette, 1), 2.5, 0, -1.7);
+  place('plantSmall1', makePlant(palette, 0.45), -0.55, lowerShelfY, -2.05);
+  place('books', makeBookStack(palette), 0.35, lowerShelfY, -2.05, 0.4);
+  place('bear', makeBear(palette), 1.25, 0, -0.15, -0.5);
+  place('radio', makeRadio(palette), 2.9, 0, -2.0, -0.2);
+  const ready = Promise.resolve();
 
   const mounted = new Map<string, Object3D>();
   return {

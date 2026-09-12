@@ -1,5 +1,5 @@
-import { BoxGeometry, Group, Mesh, Vector3 } from 'three';
-import { paper } from './materials';
+import { Group, Mesh, Vector3 } from 'three';
+import { paper, roundedBox } from './materials';
 import type { Palette } from './palette';
 
 /** 程式化書架：格位由我們決定，不綁在別人模型的層板高度上（DECISIONS D19）。 */
@@ -24,7 +24,7 @@ export function createBookcase(palette: Palette): Bookcase {
   const dark = paper(palette.woodDark);
 
   const add = (sx: number, sy: number, sz: number, x: number, y: number, z: number, m = wood) => {
-    const mesh = new Mesh(new BoxGeometry(sx, sy, sz), m);
+    const mesh = new Mesh(roundedBox(sx, sy, sz), m);
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;

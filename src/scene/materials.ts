@@ -1,4 +1,5 @@
 import { CanvasTexture, MeshStandardMaterial, RepeatWrapping, type Texture } from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 let grain: Texture | null = null;
 
@@ -44,12 +45,21 @@ export function paperGrain(): Texture {
   return grain;
 }
 
-/** 紙藝：無金屬、高粗糙、平面著色、帶紙紋。所有自製幾何都走這裡，換色板才換得動。 */
+/**
+ * 材質工廠（名字留著 paper 是歷史：D07 時是紙雕，2026-09-12 使用者裁示改**柔軟玩具風**）：
+ * 平滑著色、霧面塑膠（粗糙度 0.6）、吃環境反射；紙紋只在 grain: true 時加。所有自製幾何都走這裡，換色板才換得動。
+ */
 export function paper(color: number, opts: { roughness?: number; flat?: boolean; grain?: boolean } = {}): MeshStandardMaterial {
-  const m = new MeshStandardMaterial({ color, roughness: opts.roughness ?? 0.92, metalness: 0, flatShading: opts.flat ?? true });
-  if (opts.grain !== false) {
+  const m = new MeshStandardMaterial({ color, roughness: opts.roughness ?? 0.6, metalness: 0, flatShading: opts.flat ?? false, envMapIntensity: 0.7 });
+  if (opts.grain === true) {
     m.bumpMap = paperGrain();
     m.bumpScale = 0.0035;
   }
   return m;
+}
+
+/** 圓角盒：玩具風的基本磚。半徑預設取最短邊的 1/6，不超過 0.05。 */
+export function roundedBox(w: number, h: number, d: number, radius?: number, segments = 4): RoundedBoxGeometry {
+  const r = radius ?? Math.min(0.05, Math.min(w, h, d) / 6);
+  return new RoundedBoxGeometry(w, h, d, segments, r);
 }

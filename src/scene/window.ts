@@ -1,5 +1,5 @@
-import { BoxGeometry, CircleGeometry, Color, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape } from 'three';
-import { paper } from './materials';
+import { CircleGeometry, Color, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Shape } from 'three';
+import { paper, roundedBox } from './materials';
 import type { Palette } from './palette';
 
 /** 窗戶：天色與日月跟著裝置的真實時間走——這本身就是時鐘書的伏筆。 */
@@ -42,7 +42,7 @@ export function createWindow(palette: Palette, width = 1.0, height = 1.15): Room
   const t = 0.06;
   const depth = 0.08;
   const bar = (sx: number, sy: number, x: number, y: number) => {
-    const m = new Mesh(new BoxGeometry(sx, sy, depth), frame);
+    const m = new Mesh(roundedBox(sx, sy, depth), frame);
     m.position.set(x, y, 0);
     m.castShadow = true;
     g.add(m);
@@ -73,7 +73,7 @@ export function createWindow(palette: Palette, width = 1.0, height = 1.15): Room
     sh.quadraticCurveTo(-w / 4, h, 0, h * 0.8);
     sh.quadraticCurveTo(w / 4, h * 1.1, w / 2, 0);
     sh.closePath();
-    const m = new Mesh(new ExtrudeGeometry(sh, { depth: 0.01, bevelEnabled: false }), new MeshBasicMaterial({ color }));
+    const m = new Mesh(new ExtrudeGeometry(sh, { depth: 0.016, bevelEnabled: true, bevelSize: 0.01, bevelThickness: 0.006, bevelSegments: 3 }), new MeshBasicMaterial({ color }));
     m.position.set(x, y, z);
     g.add(m);
     return m;
@@ -89,14 +89,14 @@ export function createWindow(palette: Palette, width = 1.0, height = 1.15): Room
     sh.absarc(w * 0.28, 0.01, w * 0.2, Math.PI * 1.15, Math.PI * 2, false);
     sh.lineTo(w / 2, 0);
     sh.closePath();
-    return new ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: false });
+    return new ExtrudeGeometry(sh, { depth: 0.014, bevelEnabled: true, bevelSize: 0.008, bevelThickness: 0.005, bevelSegments: 3 });
   };
   const clouds = [new Mesh(cloudGeo(0.3), cloudMat), new Mesh(cloudGeo(0.22), cloudMat)];
   clouds[0]?.position.set(-0.2, height * 0.22, -0.026);
   clouds[1]?.position.set(0.25, height * 0.05, -0.026);
   for (const c of clouds) g.add(c);
 
-  const sill = new Mesh(new BoxGeometry(width + 0.2, 0.05, 0.16), paper(palette.wood));
+  const sill = new Mesh(roundedBox(width + 0.2, 0.05, 0.16), paper(palette.wood));
   sill.position.set(0, -height / 2 - 0.05, 0.04);
   sill.castShadow = true;
   g.add(sill);

@@ -2,7 +2,7 @@ import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Vector3, type Object3D 
 import { easeOutElastic, tween } from '../lib/tween';
 import type { Bookcase } from './bookcase';
 import { makeCoverTexture } from './book-cover';
-import { paper } from './materials';
+import { paper, roundedBox } from './materials';
 import { hex, type Palette } from './palette';
 
 export interface ShelfBookEntry {
@@ -39,7 +39,7 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
   const group = new Group();
   const books = new Map<string, ShelfBook>();
   const locals = new Map<string, Vector3>();
-  const geometry = new BoxGeometry(BOOK_SIZE.w, BOOK_SIZE.h, BOOK_SIZE.d);
+  const geometry = roundedBox(BOOK_SIZE.w, BOOK_SIZE.h, BOOK_SIZE.d);
   const lean = -0.12;
 
   entries.slice(0, bookcase.slots.length).forEach((entry, i) => {
@@ -61,7 +61,7 @@ export function createShelf(bookcase: Bookcase, entries: ShelfBookEntry[], palet
     locals.set(entry.id, mesh.position.clone());
 
     const baseZ = mesh.position.z;
-    const ribbon = new Mesh(new BoxGeometry(0.05, 0.12, BOOK_SIZE.d + 0.012), paper(0xffd45a, { flat: false }));
+    const ribbon = new Mesh(roundedBox(0.05, 0.12, BOOK_SIZE.d + 0.012), paper(0xffd45a, { flat: false }));
     ribbon.position.set(BOOK_SIZE.w * 0.28, BOOK_SIZE.h / 2 - 0.03, 0);
     ribbon.visible = false;
     mesh.add(ribbon);

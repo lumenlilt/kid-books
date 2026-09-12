@@ -24,4 +24,3 @@ export async function loadModel(url: string): Promise<Group> {
   return scene.clone(true);
 }
 
-export const modelUrl = (name: string): string => `/assets/models/kenney/furniture/${name}.glb`;

@@ -138,6 +138,19 @@ sphere("TailTip", 0.042, (0.10, -0.12, 0.43), mat=CREAM, parent=tail)
 torus("Collar", 0.165, 0.025, (0, 0.05, 0.31), (math.radians(78), 0, 0), COLLAR, parent=root)
 sphere("Bell", 0.035, (0, 0.215, 0.27), mat=GOLD, seg=14, rings=10, parent=root)
 
+# 玩具風（2026-09-12 裁示）：每個 mesh 加一級細分曲面，圓錐耳朵與尾巴接縫更圓；材質粗糙度降到 0.55
+for o in bpy.data.objects:
+    # 只細分有稜角的圓錐（耳朵）與尾巴管；球體本來就平滑，全細分會讓 GLB 從 200 KB 漲到 775 KB
+    if o.type == "MESH" and (o.name.startswith("Ear") or o.name.startswith("Tail")):
+        mod = o.modifiers.new("Smooth", "SUBSURF")
+        mod.levels = 1
+        mod.render_levels = 1
+for m in bpy.data.materials:
+    if m.use_nodes:
+        bsdf = m.node_tree.nodes.get("Principled BSDF")
+        if bsdf:
+            bsdf.inputs["Roughness"].default_value = 0.55
+
 # 匯出（三角化交給匯出器；Y-up）
 bpy.ops.object.select_all(action="SELECT")
 try:

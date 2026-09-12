@@ -20,11 +20,11 @@ export interface Palette {
 export const palettes = {
   dusk: {
     name: 'dusk', sky: 0x2b2340, skyLight: 0xffe0c0, wall: 0xf3e2c7, wallTrim: 0xe2c9a4, floor: 0xb98a5c, rug: 0xd96c5a,
-    wood: 0x8a5a3c, woodDark: 0x6b4430, accent: 0xff9f5a, paper: 0xfff6e5, ink: 0x3a2e2a,
+    wood: 0xa26d48, woodDark: 0x805239, accent: 0xff9f5a, paper: 0xfff6e5, ink: 0x3a2e2a,
   },
   morning: {
     name: 'morning', sky: 0x9fd3ff, skyLight: 0xffffff, wall: 0xfff3d6, wallTrim: 0xf0dcb0, floor: 0xd9b27c, rug: 0x7cc7b0,
-    wood: 0xb27a4e, woodDark: 0x8c5a36, accent: 0xff7f6b, paper: 0xffffff, ink: 0x2f3b4a,
+    wood: 0xc98f62, woodDark: 0xa46e48, accent: 0xff7f6b, paper: 0xffffff, ink: 0x2f3b4a,
   },
   candy: {
     name: 'candy', sky: 0xb9a6ff, skyLight: 0xfff0ff, wall: 0xffe4ef, wallTrim: 0xf7c9dc, floor: 0xf3d9c0, rug: 0xffb3c6,

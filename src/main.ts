@@ -42,7 +42,7 @@ document.documentElement.style.setProperty('--accent', hex(palette.accent));
 const renderer = createRenderer({ canvas });
 const camera = new PerspectiveCamera(38, 1, 0.1, 100);
 const layout = createLayout(renderer, camera, canvas);
-const useAo = params.get('ao') === '1';
+const useAo = params.get('ao') !== '0'; // 玩具風預設開 GTAO；iPad 卡就 ?ao=0
 const rig = createCameraRig(camera);
 const input = createInput(canvas, camera);
 
